@@ -5,8 +5,6 @@ module Util where
 import           Data.Aeson
 import           Data.Char
 
--- The following code is from https://github.com/jdreaver/oanda-rest-api/
-
 -- | Aeson Options that remove the prefix from fields
 unPrefix :: String -> Options
 unPrefix prefix = defaultOptions

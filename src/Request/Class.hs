@@ -13,9 +13,9 @@
 module Request.Class
   ( Request(..)
   , Session(..)
-  , OandaConfig (..)
-  , oandaConfigPracticeAccount
-  , oandaConfigTradeAccount
+  , KrakenConfig (..)
+  -- , krakenConfigPracticeAccount
+  , krakenConfigTradeAccount
   -- , baseUrl
   , additionalParams
   , headerContentTypeJson
@@ -42,42 +42,42 @@ import qualified Network.HTTP.Client         as C
 import           ApiMaker
 
 version :: Text
-version = "v3"
+version = "0"
 
 type AccessToken = B.ByteString
 
-oandaConfigPracticeAccount :: AccessToken -> OandaConfig
-oandaConfigPracticeAccount = OandaConfig baseUrlPractice streamUrlPractice
+-- krakenConfigPracticeAccount :: AccessToken -> KrakenConfig
+-- krakenConfigPracticeAccount = KrakenConfig baseUrlPractice streamUrlPractice
 
-oandaConfigTradeAccount :: AccessToken -> OandaConfig
-oandaConfigTradeAccount = OandaConfig baseUrlTrade streamUrlTrade
+krakenConfigTradeAccount :: AccessToken -> KrakenConfig
+krakenConfigTradeAccount = KrakenConfig baseUrlTrade -- streamUrlTrade
 
 
-data OandaConfig = OandaConfig
+data KrakenConfig = KrakenConfig
   { baseUrl     :: Url 'Https
-  , streamUrl   :: Url 'Https
+  -- , streamUrl   :: Url 'Https
   , accessToken :: AccessToken
   }
 
 
-additionalParams :: OandaConfig -> [Option 'Https]
+additionalParams :: KrakenConfig -> [Option 'Https]
 additionalParams config = [headerBearer config]
 
 baseUrlTrade :: Url 'Https
-baseUrlTrade = https "api-fxtrade.oanda.com" /: version
+baseUrlTrade = https "api.kraken.com" /: version
 
-baseUrlPractice :: Url 'Https
-baseUrlPractice = https "api-fxpractice.oanda.com" /: version
+-- baseUrlPractice :: Url 'Https
+-- baseUrlPractice = https "api.kraken.com" /: version
 
-streamUrlTrade :: Url 'Https
-streamUrlTrade = https "stream-fxtrade.oanda.com" /: version
+-- streamUrlTrade :: Url 'Https
+-- streamUrlTrade = https "stream-fxtrade.kraken.com" /: version
 
-streamUrlPractice :: Url 'Https
-streamUrlPractice = https "stream-fxpractice.oanda.com" /: version
+-- streamUrlPractice :: Url 'Https
+-- streamUrlPractice = https "stream-fxpractice.kraken.com" /: version
 
--- TODO: see http://hdiff.luite.com/cgit/oanda-rest-api/commit?id=0.4.0 for streaming
+-- TODO: see http://hdiff.luite.com/cgit/kraken-rest-api/commit?id=0.4.0 for streaming
 
-headerBearer :: OandaConfig -> Option 'Https
+headerBearer :: KrakenConfig -> Option 'Https
 headerBearer config = header "Authorization" ("Bearer " <> accessToken config)
 
 headerRFC3339DatetimeFormat :: Option 'Https

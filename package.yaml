@@ -1,6 +1,6 @@
-name:                oanda-api
+name:                kraken-api
 version:             0.1.0.0
-github:              "schnecki/oanda-api"
+github:              "schnecki/kraken-api"
 license:             BSD3
 author:              "Manuel Schneckenreither"
 maintainer:          "manuel.schneckenreither@uibk.ac.at"
@@ -17,11 +17,12 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/schnecki/oanda-api#readme>
+description:         Please see the README on GitHub at <https://github.com/schnecki/kraken-api#readme>
 
 dependencies:
 - base >= 4.7 && < 5
 - aeson
+- aeson-casing
 - bytestring
 - http-client
 - http-client-tls
@@ -30,6 +31,7 @@ dependencies:
 - transformers-base
 - transformers
 - containers
+- unordered-containers
 - monad-control
 - mtl
 - time
@@ -43,6 +45,7 @@ dependencies:
 - timerep
 - pretty
 - api-maker
+- easy-logger
 - cereal
 - cereal-text
 - cereal-time
@@ -68,7 +71,7 @@ library:
       default-extensions: NoStarIsType
 
 executables:
-  oanda-api:
+  kraken-api:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -76,10 +79,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - oanda-api
+    - kraken-api
 
 tests:
-  oanda-api-test:
+  kraken-api-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -87,4 +90,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - oanda-api
+    - kraken-api

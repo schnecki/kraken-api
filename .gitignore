@@ -24,3 +24,6 @@ cabal.project.local~
 TAGS
 stack.yaml.lock
 /oanda-api.cabal
+/borl-trader.log
+g
+/kraken-api.cabal

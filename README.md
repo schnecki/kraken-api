@@ -1,10 +1,10 @@
-# oanda-api
+# kraken-api
 
-API to oanda
+API to kraken.com
 
 ## Cloning & Building
 
 Ensure to clone all submodules:
 
-    git clone --recursive git@github.com:schnecki/oanda-api.git
+    git clone --recursive git@github.com:schnecki/kraken-api.git
     stack build
