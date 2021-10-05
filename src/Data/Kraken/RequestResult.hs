@@ -26,17 +26,19 @@ import           Data.Kraken.Util
 
 data RequestResult a = RequestResult
   { error  :: [RequestError]         -- ^ The system status
-  , result :: a
+  , result :: Maybe a
   } deriving (Show, Read, Eq, Ord, Serialize, Generic, FromJSON, NFData)
 
 
 fromRequestResult :: (MonadError SafeException m) => RequestResult a -> m a
-fromRequestResult (RequestResult [] res) = return res
+fromRequestResult (RequestResult [] (Just res)) = return res
 fromRequestResult (RequestResult err _)  = throwUserException $ EUnknownError $ T.intercalate ";" $ map tshow err
 
 
 prettyRequestResult :: (a -> Doc) -> RequestResult a -> Doc
-prettyRequestResult pRes res =
-  colName "error"      $$ nest nestCols (text $ show $ Data.Kraken.RequestResult.error res) $+$
-  colName "result"     $$ nest nestCols (pRes $ result res)
+prettyRequestResult pRes (RequestResult err (Just res)) =
+  colName "error"      $$ nest nestCols (text $ show err) $+$
+  colName "result"     $$ nest nestCols (pRes res)
+prettyRequestResult pRes (RequestResult err Nothing) =
+  colName "error"      $$ nest nestCols (text $ show err)
 

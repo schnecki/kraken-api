@@ -9,6 +9,7 @@ module Request.Kraken.AssetInfoGET
   ) where
 
 import           ApiMaker
+import qualified Data.Text                 as T
 
 import           Data.Kraken.AssetClass
 import           Data.Kraken.AssetInfo
@@ -30,11 +31,13 @@ instance Request KrakenConfig GetAssetInfo where
   type Output GetAssetInfo = AssetInfoList
   method _ GetAssetInfo {} = GET
   url cfg GetAssetInfo {} = baseUrl cfg /: "public" /: "Assets"
-  body _ GetAssetInfo {} = NoReqBody
+  body _ GetAssetInfo {} = NoReqBody -- ReqBodyUrlEnc configs
   response _ GetAssetInfo {} = jsonResponse
-  option _ GetAssetInfo {} = headerRFC3339DatetimeFormat
-  option _ (GetAssetInfo _ mAclass) = headerRFC3339DatetimeFormat <> configs
+  option _ (GetAssetInfo instr mAclass) = headerRFC3339DatetimeFormat <> configs
     where
-      configs = "aclass" `queryParam` fmap (strToLower . show) mAclass
+      configs =
+        "asset"  `queryParam` Just instr <>
+        "aclass" `maybeQueryParam` (Nothing :: Maybe T.Text) -- Just (T.pack "currency") -- fmap (strToLower . show) mAclass
   process _ GetAssetInfo {} resp = fromRequestResult $ responseBody resp
+
 

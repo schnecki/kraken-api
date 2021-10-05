@@ -35,7 +35,7 @@ main = do
     runSessReqWithParamsM (additionalParams cfg) cfg $ runRequests $ do
       res <- mkReq GetSystemStatus
       liftIO $ putStrLn $ take 100 $ show res
-      res <- mkReq $ GetAssetInfo "ADA" Nothing
+      res <- mkReq $ GetAssetInfo "INJ,ADA" Nothing
       liftIO $ print res
 
       -- accs <- mkReq GetAccounts

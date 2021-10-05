@@ -36,3 +36,4 @@ instance FromJSON AssetClass where
           mkWord = pascalCase . filter (/= '"') .show
   parseJSON v = genericParseJSON jsonSnakeCase v
 
+
