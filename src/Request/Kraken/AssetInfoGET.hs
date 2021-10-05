@@ -37,7 +37,7 @@ instance Request KrakenConfig GetAssetInfo where
     where
       configs =
         "asset"  `queryParam` Just instr <>
-        "aclass" `maybeQueryParam` (Nothing :: Maybe T.Text) -- Just (T.pack "currency") -- fmap (strToLower . show) mAclass
+        "aclass" `maybeQueryParam` fmap (strToLower . show) mAclass
   process _ GetAssetInfo {} resp = fromRequestResult $ responseBody resp
 
 
