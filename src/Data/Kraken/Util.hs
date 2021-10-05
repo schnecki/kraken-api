@@ -1,10 +1,7 @@
-{-# LANGUAGE DataKinds      #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE DeriveGeneric  #-}
-{-# LANGUAGE GADTs          #-}
-{-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE PolyKinds      #-}
-{-# LANGUAGE TypeFamilies   #-}
+{-# LANGUAGE DataKinds    #-}
+{-# LANGUAGE GADTs        #-}
+{-# LANGUAGE PolyKinds    #-}
+{-# LANGUAGE TypeFamilies #-}
 module Data.Kraken.Util
     ( jsonSnakeCase
     , nestCols
@@ -21,7 +18,10 @@ import           Prelude           hiding ((<>))
 import           Text.PrettyPrint
 
 jsonSnakeCase :: Options
-jsonSnakeCase = defaultOptions { constructorTagModifier = snakeCase }
+jsonSnakeCase = defaultOptions { constructorTagModifier = snakeCase, fieldLabelModifier = snakeCase }
+
+-- jsonCamelCase :: Options
+-- jsonCamelCase = defaultOptions { constructorTagModifier = snakeCase }
 
 
 nestCols :: Int

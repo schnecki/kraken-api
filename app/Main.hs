@@ -21,7 +21,7 @@ import           Prelude                   hiding (id)
 import           Data.Kraken.DateTime
 -- import           Data.Kraken.Instrument
 -- import           Data.Kraken.OrderRequest
-import           Request
+import           KrakenApi
 
 main :: IO ()
 main = do
@@ -33,8 +33,10 @@ main = do
   let cfg = krakenConfigTradeAccount apiKey
   res <-
     runSessReqWithParamsM (additionalParams cfg) cfg $ runRequests $ do
-      res <- mkReq GetSystemStatus `catchError` (\e -> error "asdf")
+      res <- mkReq GetSystemStatus
       liftIO $ putStrLn $ take 100 $ show res
+      res <- mkReq $ GetAssetInfo "ADA" Nothing
+      liftIO $ print res
 
       -- accs <- mkReq GetAccounts
       -- liftIO $ print accs

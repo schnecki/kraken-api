@@ -1,11 +1,10 @@
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings     #-}
-{-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeFamilies          #-}
 
 
-module Request.SystemStatusGET
+module Request.Kraken.SystemStatusGET
   ( GetSystemStatus(..)
   ) where
 
@@ -13,7 +12,7 @@ import           ApiMaker
 
 import           Data.Kraken.RequestResult
 import           Data.Kraken.SystemStatus
-import           Request.Class
+import           Request.Kraken.Class
 
 
 data GetSystemStatus = GetSystemStatus

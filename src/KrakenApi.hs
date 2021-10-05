@@ -6,4 +6,4 @@ module KrakenApi
 
 import           ApiMaker          as Kraken
 import           Data.Kraken.Types as Kraken
-import           Request           as Kraken
+import           Request.Kraken    as Kraken

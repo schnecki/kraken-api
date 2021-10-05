@@ -10,7 +10,7 @@
 {-# LANGUAGE TypeFamilies               #-}
 {-# LANGUAGE UndecidableInstances       #-}
 {-# LANGUAGE UndecidableSuperClasses    #-}
-module Request.Class
+module Request.Kraken.Class
   ( Request(..)
   , Session(..)
   , KrakenConfig (..)
