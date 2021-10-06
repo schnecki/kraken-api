@@ -2,7 +2,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE TypeSynonymInstances       #-}
-module Data.Oanda.PriceValue
+module Data.Kraken.PriceValue
   ( PriceValue(..)
   , WorstPriceValue
   , prettyPriceValue
@@ -11,7 +11,7 @@ module Data.Oanda.PriceValue
 
 import           Control.DeepSeq
 import           Data.Aeson
-import           Data.Scientific  (toRealFloat)
+import           Data.Scientific
 import           Data.Serialize
 import           Data.Text        (pack, unpack)
 import           GHC.Generics
@@ -32,7 +32,7 @@ newtype PriceValue =
 instance FromJSON PriceValue where
   parseJSON (String v) = maybe (fail $ "expected number, encounted " ++ unpack v) (return . PriceValue) (readMaybe $ unpack v)
   parseJSON (Number v) = return $ PriceValue (toRealFloat v)
-  parseJSON v = fail $ "Cannot parse non string to number (value was '" ++ show v ++ "') in parseJSON of PriceValue"
+  parseJSON v = fail $ "Cannot parse non string to nubmer (value was '" ++ show v ++ "') in parseJSON of PriceValue"
 
 instance ToJSON PriceValue where
   toJSON (PriceValue x) = String $ pack (printf "%.4f" x :: String)

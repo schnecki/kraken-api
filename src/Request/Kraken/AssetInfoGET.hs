@@ -20,7 +20,7 @@ import           Request.Kraken.Util
 
 data GetAssetInfo =
   GetAssetInfo InstrumentName -- ^ Instrument Name. Example: "ADA"
-  (Maybe AssetClass) -- ^ Asset class. (optional, default: currency). Example: Currency
+  (Maybe AssetClass)          -- ^ Asset class. (optional, default: currency). Example: Currency
 
 
 instance Request KrakenConfig GetAssetInfo where

@@ -28,6 +28,7 @@ data TradableAssetPairObject = TradableAssetPairObject
 prettyTradableAssetPairObject :: TradableAssetPairObject -> Doc
 prettyTradableAssetPairObject (TradableAssetPairObject n p) =
   colName "Asset Pair Name" $$ nest nestCols (text $ T.unpack n) $+$
-  colName "Asset Pair"      $$ nest nestCols (prettyTradableAssetPair p)
+  -- colName "Asset Pair"      $$
+  nest nestIndent (prettyTradableAssetPairWith nestIndent p)
 
 

@@ -3,6 +3,7 @@
 module Data.Kraken.AssetInfo
     ( AssetInfo (..)
     , prettyAssetInfo
+    , prettyAssetInfoWith
     ) where
 
 
@@ -37,9 +38,12 @@ instance FromJSON AssetInfo where
 
 
 prettyAssetInfo :: AssetInfo -> Doc
-prettyAssetInfo info =
+prettyAssetInfo = prettyAssetInfoWith 0
 
-  colName "aclass"          $$ nest nestCols (prettyAssetClass $ aclass info) $+$
-  colName "altname"         $$ nest nestCols (text $ T.unpack $ altname info) $+$
-  colName "decimals"        $$ nest nestCols (int $ decimals info) $+$
-  colName "displayDecimals" $$ nest nestCols (int $ displayDecimals info)
+prettyAssetInfoWith :: Int -> AssetInfo -> Doc
+prettyAssetInfoWith nesting info =
+  colName "aclass"          $$ nest n2 (prettyAssetClass $ aclass info) $+$
+  colName "altname"         $$ nest n2 (text $ T.unpack $ altname info) $+$
+  colName "decimals"        $$ nest n2 (int $ decimals info) $+$
+  colName "displayDecimals" $$ nest n2 (int $ displayDecimals info)
+  where n2 = nestCols - nesting

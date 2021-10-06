@@ -3,8 +3,10 @@
 {-# LANGUAGE PolyKinds    #-}
 {-# LANGUAGE TypeFamilies #-}
 module Data.Kraken.Util
-    ( jsonSnakeCase
+    ( parseStrToNum
+    , jsonSnakeCase
     , nestCols
+    , nestIndent
     , colName
     , mVal
     , mDefVal
@@ -15,10 +17,17 @@ module Data.Kraken.Util
 
 import           Data.Aeson
 import           Data.Aeson.Casing
+import           Data.Aeson.Types
 import           Data.List         (intersperse)
 import qualified Data.Text         as T
 import           Prelude           hiding ((<>))
 import           Text.PrettyPrint
+import           Text.Read         (readMaybe)
+
+parseStrToNum :: Value -> Parser Value
+parseStrToNum (String v) = maybe (fail $ "Could not convert string to Number. String: " ++ show v) (return . Number) (readMaybe $ T.unpack v)
+parseStrToNum x@Number{} = return x
+parseStrToNum v = fail $ "Expected string of number or number, but encountered : " ++ show v
 
 jsonSnakeCase :: Options
 jsonSnakeCase = defaultOptions { constructorTagModifier = snakeCase, fieldLabelModifier = snakeCase }
@@ -35,6 +44,9 @@ hsepComma = hsepWith (char ',')
 
 nestCols :: Int
 nestCols = 65
+
+nestIndent :: Int
+nestIndent = 10
 
 
 colName :: String -> Doc

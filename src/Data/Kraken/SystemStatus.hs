@@ -25,6 +25,6 @@ data SystemStatus = SystemStatus
 
 prettySystemStatus :: SystemStatus -> Doc
 prettySystemStatus st =
-  colName "instrument"      $$ nest nestCols (text $ show $ status st) $+$
-  colName "granularity"     $$ nest nestCols (text $ show $ timestamp st)
+  colName "System Status"      $$ nest nestCols (text $ show $ status st) $+$
+  colName "System Timestamp"       $$ nest nestCols (text $ show $ timestamp st)
 

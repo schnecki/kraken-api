@@ -27,4 +27,6 @@ data AssetInfoObject = AssetInfoObject
 prettyAssetInfoObject :: AssetInfoObject -> Doc
 prettyAssetInfoObject (AssetInfoObject instr info) =
   colName "Asset Name" $$ nest nestCols (text $ T.unpack instr) $+$
-  colName "Asset Info"  $$ nest nestCols (prettyAssetInfo info)
+  -- colName "Asset Info"  $$
+  nest nestIndent (prettyAssetInfoWith nestIndent info)
+

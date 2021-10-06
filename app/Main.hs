@@ -3,24 +3,25 @@
 module Main where
 
 import           ApiMaker
-import           Control.Monad             (forM, forM_, void)
+import           Control.Monad                     (forM, forM_, void)
 import           Control.Monad.Except
-import           Control.Monad.Trans       (liftIO)
+import           Control.Monad.Trans               (liftIO)
 import           Control.Monad.Trans.State
-import           Data.Aeson                (encode)
-import qualified Data.ByteString           as B
-import qualified Data.ByteString.Char8     as C
-import qualified Data.Text                 as T
+import           Data.Aeson                        (encode)
+import qualified Data.ByteString                   as B
+import qualified Data.ByteString.Char8             as C
+import qualified Data.Text                         as T
 import           Data.Time.Clock
-import qualified Data.Word                 as W8
+import qualified Data.Word                         as W8
 import           EasyLogger
-import           Prelude                   hiding (id)
+import           Prelude                           hiding (id)
 
--- import           Data.Kraken.AccountProperties
--- import           Data.Kraken.Accounts
+import           Data.Kraken.AssetInfoList
 import           Data.Kraken.DateTime
--- import           Data.Kraken.Instrument
--- import           Data.Kraken.OrderRequest
+import           Data.Kraken.ServerTime
+import           Data.Kraken.SystemStatus
+import           Data.Kraken.TickerInformationList
+import           Data.Kraken.TradableAssetPairList
 import           KrakenApi
 
 main :: IO ()
@@ -35,14 +36,16 @@ main = do
   res <-
     runSessReqWithParamsM (additionalParams cfg) cfg $ runRequests $ do
       res <- mkReq GetServerTime
-      liftIO $ print res
+      liftIO $ print $ prettyServerTime res
       res <- mkReq GetSystemStatus
-      liftIO $ putStrLn $ take 200 $ show res
+      liftIO $ print $ prettySystemStatus res
       res <- mkReq $ GetAssetInfo "INJ,ADA" Nothing
-      liftIO $ print res
+      liftIO $ print $ prettyAssetInfoList res
+      res <- mkReq $ GetTradableAssetPairs (TradableAssetPairsConfig "ADAEUR" (Just Info))
+      liftIO $ print $ prettyTradableAssetPairList res
       liftIO $ enableRequestLogging (LogFile "borl-trader.log") LogDebug
-      res <- mkReq $ GetTradableAssetPairs (TradableAssetPairsConfig "XXBTZUSD,XETHXXBT" (Just Info))
-      liftIO $ putStrLn $ take 200 $ show res
+      res <- mkReq $ GetTickerInformation "ADAEUR"
+      liftIO $ print $ prettyTickerInformationList res
 
       -- accs <- mkReq GetAccounts
       -- liftIO $ print accs

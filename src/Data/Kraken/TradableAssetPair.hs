@@ -4,24 +4,24 @@
 module Data.Kraken.TradableAssetPair
     ( TradableAssetPair(..)
     , prettyTradableAssetPair
+    , prettyTradableAssetPairWith
     ) where
 
-import           Control.Applicative    ((<|>))
+import           Control.Applicative      ((<|>))
 import           Control.DeepSeq
 import           Data.Aeson
-import qualified Data.HashMap.Strict    as HM
+import qualified Data.HashMap.Strict      as HM
 import           Data.Serialize
-import           Data.Serialize.Text    ()
-import qualified Data.Text              as T
+import           Data.Serialize.Text      ()
+import qualified Data.Text                as T
 import           GHC.Generics
-import           Prelude                hiding ((<>))
+import           Prelude                  hiding ((<>))
 import           Text.PrettyPrint
 
 import           Data.Kraken.AssetClass
+import           Data.Kraken.OrderMinimum
 import           Data.Kraken.Types
 import           Data.Kraken.Util
-
-import           Debug.Trace
 
 
 data TradableAssetPair
@@ -33,7 +33,7 @@ data TradableAssetPair
       , aclassQuote       :: AssetClass           -- ^ Asset class of quote component
       , quote             :: InstrumentName       -- ^ Asset ID of quote component
       , lot               :: T.Text               -- ^ deprecated Volume lot size -- ^
-      , airDecimals       :: Integer              -- ^ caling decimal places for pair
+      , pairDecimals      :: Integer              -- ^ caling decimal places for pair
       , lotDecimals       :: Integer              -- ^ Scaling decimal places for volume
       , lotMultiplier     :: Integer              -- ^ Amount to multiply lot volume by to get currency volume
       , leverageBuy       :: [Integer]            -- ^ Array of leverage amounts available when buying
@@ -43,7 +43,7 @@ data TradableAssetPair
       , feeVolumeCurrency :: InstrumentName       -- ^ Volume discount currency
       , marginCall        :: Integer              -- ^ Margin call level
       , marginStop        :: Integer              -- ^ Stop-out/liquidation margin level
-      , ordermin          :: Double               -- ^ Minimum order size (in terms of base currency)
+      , ordermin          :: OrderMinimum               -- ^ Minimum order size (in terms of base currency)
       }
   | TradableAssetPairLeverage
       { leverageBuy  :: [Integer] -- ^ Array of leverage amounts available when buying
@@ -75,24 +75,43 @@ instance FromJSON TradableAssetPair where
 
 
 prettyTradableAssetPair :: TradableAssetPair -> Doc
-prettyTradableAssetPair pair =
-    colName "altname"            $$ nest nestCols (text . T.unpack $ altname pair) $+$
-    colName "wsname"             $$ nest nestCols (maybe mempty (text . T.unpack) $ wsname pair) $+$
-    colName "aclassBase"         $$ nest nestCols (prettyAssetClass $ aclassBase pair) $+$
-    colName "base"               $$ nest nestCols (text . T.unpack $ base pair) $+$
-    colName "aclassQuote"        $$ nest nestCols (prettyAssetClass $ aclassQuote pair) $+$
-    colName "quote"              $$ nest nestCols (text . T.unpack $ quote pair) $+$
-    colName "lot"                $$ nest nestCols (text . T.unpack $ lot pair) $+$
-    colName "airDecimals"        $$ nest nestCols (integer $ airDecimals pair) $+$
-    colName "lotDecimals"        $$ nest nestCols (integer $ lotDecimals pair) $+$
-    colName "lotMultiplier"      $$ nest nestCols (integer $ lotMultiplier pair) $+$
-    colName "leverageBuy"        $$ nest nestCols (hsepComma $ map integer $ leverageBuy pair) $+$
-    colName "leverageSell"       $$ nest nestCols (hcat $ map integer $ leverageSell pair) $+$
-    colName "fees"               $$ nest nestCols (hsepComma $ map tuple $ fees pair) $+$
-    colName "feesMaker"          $$ nest nestCols (hsepComma $ map tuple $ feesMaker pair) $+$
-    colName "feeVolumeCurrency"  $$ nest nestCols (text . T.unpack $ feeVolumeCurrency pair) $+$
-    colName "marginCall"         $$ nest nestCols (integer $ marginCall pair) $+$
-    colName "marginStop"         $$ nest nestCols (integer $ marginStop pair) $+$
-    colName "ordermin"           $$ nest nestCols (double $ ordermin pair)
+prettyTradableAssetPair = prettyTradableAssetPairWith 0
+
+
+prettyTradableAssetPairWith :: Int -> TradableAssetPair -> Doc
+prettyTradableAssetPairWith nesting pair@TradableAssetPair{} =
+    colName "altname"            $$ nest n2 (text . T.unpack $ altname pair) $+$
+    colName "wsname"             $$ nest n2 (maybe mempty (text . T.unpack) $ wsname pair) $+$
+    colName "aclassBase"         $$ nest n2 (prettyAssetClass $ aclassBase pair) $+$
+    colName "base"               $$ nest n2 (text . T.unpack $ base pair) $+$
+    colName "aclassQuote"        $$ nest n2 (prettyAssetClass $ aclassQuote pair) $+$
+    colName "quote"              $$ nest n2 (text . T.unpack $ quote pair) $+$
+    colName "lot"                $$ nest n2 (text . T.unpack $ lot pair) $+$
+    colName "pairDecimals"       $$ nest n2 (integer $ pairDecimals pair) $+$
+    colName "lotDecimals"        $$ nest n2 (integer $ lotDecimals pair) $+$
+    colName "lotMultiplier"      $$ nest n2 (integer $ lotMultiplier pair) $+$
+    colName "leverageBuy"        $$ nest n2 (hsepComma $ map integer $ leverageBuy pair) $+$
+    colName "leverageSell"       $$ nest n2 (hsepComma $ map integer $ leverageSell pair) $+$
+    colName "fees"               $$ nest n2 (hsepComma $ map tuple $ fees pair) $+$
+    colName "feesMaker"          $$ nest n2 (hsepComma $ map tuple $ feesMaker pair) $+$
+    colName "feeVolumeCurrency"  $$ nest n2 (text . T.unpack $ feeVolumeCurrency pair) $+$
+    colName "marginCall"         $$ nest n2 (integer $ marginCall pair) $+$
+    colName "marginStop"         $$ nest n2 (integer $ marginStop pair) $+$
+    colName "ordermin"           $$ nest n2 (prettyOrderMinimum $ ordermin pair)
   where tuple [a, b] = parens (double a <> comma <+> double b)
         tuple x      = text (show x)
+        n2 = nestCols - nesting
+prettyTradableAssetPairWith nesting pair@TradableAssetPairLeverage{} =
+    colName "leverageBuy"        $$ nest n2 (hsepComma $ map integer $ leverageBuy pair) $+$
+    colName "leverageSell"       $$ nest n2 (hsepComma $ map integer $ leverageSell pair)
+  where n2 = nestCols - nesting
+prettyTradableAssetPairWith nesting pair@TradableAssetPairFees{} =
+    colName "fees"               $$ nest n2 (hsepComma $ map tuple $ fees pair) $+$
+    colName "feesMaker"          $$ nest n2 (hsepComma $ map tuple $ feesMaker pair)
+  where tuple [a, b] = parens (double a <> comma <+> double b)
+        tuple x      = text (show x)
+        n2 = nestCols - nesting
+prettyTradableAssetPairWith nesting pair@TradableAssetPairMargin{} =
+    colName "marginCall"         $$ nest n2 (integer $ marginCall pair) $+$
+    colName "marginLevel"         $$ nest n2 (integer $ marginLevel pair)
+  where n2 = nestCols - nesting
