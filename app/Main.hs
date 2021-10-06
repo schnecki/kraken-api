@@ -13,7 +13,7 @@ import qualified Data.ByteString.Char8     as C
 import qualified Data.Text                 as T
 import           Data.Time.Clock
 import qualified Data.Word                 as W8
-import           Logging
+import           EasyLogger
 import           Prelude                   hiding (id)
 
 -- import           Data.Kraken.AccountProperties
@@ -26,6 +26,7 @@ import           KrakenApi
 main :: IO ()
 main = do
   $(initLogger) (LogFile "borl-trader.log") LogDebug
+  -- $(initLoggerAllPackages) (LogFile "borl-trader.log") LogAll True
   $(logInfo) ("Starting App" :: T.Text)
 
   apiKey <- C.filter (/= '\n') <$> B.readFile "API_KEY"
@@ -33,32 +34,37 @@ main = do
   let cfg = krakenConfigTradeAccount apiKey
   res <-
     runSessReqWithParamsM (additionalParams cfg) cfg $ runRequests $ do
+      res <- mkReq GetServerTime
+      liftIO $ print res
       res <- mkReq GetSystemStatus
-      liftIO $ putStrLn $ take 100 $ show res
+      liftIO $ putStrLn $ take 200 $ show res
       res <- mkReq $ GetAssetInfo "INJ,ADA" Nothing
       liftIO $ print res
+      liftIO $ enableRequestLogging (LogFile "borl-trader.log") LogDebug
+      res <- mkReq $ GetTradableAssetPairs (TradableAssetPairsConfig "XXBTZUSD,XETHXXBT" (Just Info))
+      liftIO $ putStrLn $ take 200 $ show res
 
       -- accs <- mkReq GetAccounts
       -- liftIO $ print accs
       -- forM_ (accounts accs) $ \prop -> do
       --   let accId = id prop
       --   res <- mkReq $ GetSystemStatus
-      --   liftIO $ putStrLn $ take 100 $ show res
+      --   liftIO $ putStrLn $ take 200 $ show res
         -- res <- mkReq $ GetAccountSummary accId
-        -- liftIO $ putStrLn $ take 100 $ show res
+        -- liftIO $ putStrLn $ take 200 $ show res
         -- insts <- mkReq $ GetInstruments accId Nothing
-        -- liftIO $ putStrLn $ take 100 $ show insts
+        -- liftIO $ putStrLn $ take 200 $ show insts
         -- let config = AccountConfigurationUpdate (Just "Test Account Nr uno") (Just 1)
         -- liftIO $ print $ "Trying to set following values: " <> encode config
         -- res <- mkReq $ PatchAccountConfiguration accId config
-        -- liftIO $ putStrLn $ take 100 $ show res
+        -- liftIO $ putStrLn $ take 200 $ show res
         -- now <- liftIO getCurrentTime
         -- let other = addUTCTime (negate $ fromIntegral $ 60 * 60 * 24 * 365 * 8) now
         -- let candleCfg = CandleConfig (Just "M") (Just S5) (Just 6) (Just $ DateTime $ Just other)
         --       Nothing Nothing Nothing Nothing Nothing Nothing -- count=6&price=M&granularity=S5
         -- res <- mkReq $ GetInstrumentCandle "EUR_USD" candleCfg
         -- liftIO $ print res
-      --   liftIO $ putStrLn $ take 100 $ show res
+      --   liftIO $ putStrLn $ take 200 $ show res
       --   let orderReq = marketOrder "EUR_USD" 1.0 FOKMarketOrder 0.8
       --   liftIO $ print $ encode orderReq
       -- -- res <- mkReq $ PostOrder accId orderReq
@@ -66,3 +72,4 @@ main = do
       --   res <- mkReq $ GetAccountSummary accId
       --   liftIO $ print res
   print res
+  finalizeAllLoggers

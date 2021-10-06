@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveGeneric  #-}
 module Data.Kraken.AssetInfoList
     ( AssetInfoList (..)
+    , prettyAssetInfoList
     ) where
 
 
@@ -9,16 +10,11 @@ import           Control.DeepSeq
 import           Data.Aeson
 import           Data.HashMap.Strict         (elems, keys)
 import           Data.Serialize
-import           Data.Serialize.Text
-import qualified Data.Text                   as T
 import           GHC.Generics
+import           Text.PrettyPrint
 
-import           Data.Kraken.AssetClass
 import           Data.Kraken.AssetInfoObject
-import           Data.Kraken.Types
-import           Data.Kraken.Util
 
-import           Debug.Trace
 
 data AssetInfoList =
   AssetInfoList
@@ -30,3 +26,6 @@ data AssetInfoList =
 instance FromJSON AssetInfoList where
   parseJSON val = withObject "Data.Kraken.AssetInfoList" (\o -> AssetInfoList . zipWith AssetInfoObject (keys o) <$> mapM parseJSON (elems o)) val
 
+
+prettyAssetInfoList :: AssetInfoList -> Doc
+prettyAssetInfoList (AssetInfoList xs) = vcat (map prettyAssetInfoObject xs)

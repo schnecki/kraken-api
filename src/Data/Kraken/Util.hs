@@ -9,10 +9,13 @@ module Data.Kraken.Util
     , mVal
     , mDefVal
     , tshow
+    , hsepWith
+    , hsepComma
     ) where
 
 import           Data.Aeson
 import           Data.Aeson.Casing
+import           Data.List         (intersperse)
 import qualified Data.Text         as T
 import           Prelude           hiding ((<>))
 import           Text.PrettyPrint
@@ -22,6 +25,12 @@ jsonSnakeCase = defaultOptions { constructorTagModifier = snakeCase, fieldLabelM
 
 -- jsonCamelCase :: Options
 -- jsonCamelCase = defaultOptions { constructorTagModifier = snakeCase }
+
+hsepWith :: Doc -> [Doc] -> Doc
+hsepWith x xs = hsep (intersperse x xs)
+
+hsepComma :: [Doc] -> Doc
+hsepComma = hsepWith (char ',')
 
 
 nestCols :: Int

@@ -2,23 +2,19 @@
 {-# LANGUAGE DeriveGeneric  #-}
 module Data.Kraken.AssetInfoObject
     ( AssetInfoObject (..)
+    , prettyAssetInfoObject
     ) where
 
 
 import           Control.DeepSeq
-import           Data.Aeson
-import           Data.HashMap.Strict    (elems, keys)
 import           Data.Serialize
-import           Data.Serialize.Text
-import qualified Data.Text              as T
+import qualified Data.Text             as T
 import           GHC.Generics
+import           Text.PrettyPrint
 
-import           Data.Kraken.AssetClass
 import           Data.Kraken.AssetInfo
 import           Data.Kraken.Types
 import           Data.Kraken.Util
-
-import           Debug.Trace
 
 
 data AssetInfoObject = AssetInfoObject
@@ -27,3 +23,8 @@ data AssetInfoObject = AssetInfoObject
   }
   deriving (Read, Show, Eq, Ord, Generic, NFData, Serialize)
 
+
+prettyAssetInfoObject :: AssetInfoObject -> Doc
+prettyAssetInfoObject (AssetInfoObject instr info) =
+  colName "Asset Name" $$ nest nestCols (text $ T.unpack instr) $+$
+  colName "Asset Info"  $$ nest nestCols (prettyAssetInfo info)

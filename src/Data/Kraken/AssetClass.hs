@@ -2,25 +2,20 @@
 {-# LANGUAGE DeriveGeneric  #-}
 module Data.Kraken.AssetClass
     ( AssetClass (..)
-
+    , prettyAssetClass
     ) where
 
 
 import           Control.DeepSeq
 import           Data.Aeson
 import           Data.Aeson.Casing
-import           Data.ByteString.Lazy (fromStrict)
-import           Data.Char
-import qualified Data.HashMap.Strict  as HM
 import           Data.Serialize
-import qualified Data.Text            as T
-import           Data.Text.Encoding   as TSE
 import           GHC.Generics
-import           Text.Read            (readMaybe)
+import           Text.PrettyPrint  (Doc, text)
+import           Text.Read         (readMaybe)
 
 import           Data.Kraken.Util
 
-import           Debug.Trace
 
 data AssetClass =
   Currency -- ^ Currency
@@ -37,3 +32,5 @@ instance FromJSON AssetClass where
   parseJSON v = genericParseJSON jsonSnakeCase v
 
 
+prettyAssetClass :: AssetClass -> Doc
+prettyAssetClass = text . show

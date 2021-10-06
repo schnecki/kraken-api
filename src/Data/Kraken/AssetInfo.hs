@@ -2,23 +2,22 @@
 {-# LANGUAGE DeriveGeneric  #-}
 module Data.Kraken.AssetInfo
     ( AssetInfo (..)
+    , prettyAssetInfo
     ) where
 
 
 import           Control.DeepSeq
 import           Data.Aeson
-import           Data.Aeson.Casing
-import           Data.HashMap.Strict    (elems, keys)
 import           Data.Serialize
-import           Data.Serialize.Text
+import           Data.Serialize.Text    ()
 import qualified Data.Text              as T
 import           GHC.Generics
+import           Text.PrettyPrint
 
 import           Data.Kraken.AssetClass
 import           Data.Kraken.Types
 import           Data.Kraken.Util
 
-import           Debug.Trace
 
 data AssetInfo =
   AssetInfo
@@ -37,3 +36,10 @@ instance FromJSON AssetInfo where
   parseJSON = genericParseJSON jsonSnakeCase
 
 
+prettyAssetInfo :: AssetInfo -> Doc
+prettyAssetInfo info =
+
+  colName "aclass"          $$ nest nestCols (prettyAssetClass $ aclass info) $+$
+  colName "altname"         $$ nest nestCols (text $ T.unpack $ altname info) $+$
+  colName "decimals"        $$ nest nestCols (int $ decimals info) $+$
+  colName "displayDecimals" $$ nest nestCols (int $ displayDecimals info)
