@@ -10,7 +10,6 @@ module Data.Kraken.TickDataList
 
 import           Control.DeepSeq
 import           Data.Aeson
-import           Data.Aeson.Types
 import qualified Data.HashMap.Strict                as HM (elems, filterWithKey, keys)
 import           Data.Serialize
 import qualified Data.Vector                        as V
@@ -22,7 +21,6 @@ import           Data.Kraken.DateTime
 import           Data.Kraken.TickDataObject
 import           Data.Kraken.Util
 
-import           Debug.Trace
 
 data TickDataList =
   TickDataList

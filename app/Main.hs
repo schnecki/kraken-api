@@ -19,6 +19,7 @@ import           Prelude                            hiding (id)
 import           Data.Kraken.AssetInfoList
 import           Data.Kraken.CandlestickGranularity
 import           Data.Kraken.DateTime
+import           Data.Kraken.OrderBookList
 import           Data.Kraken.ServerTime
 import           Data.Kraken.SystemStatus
 import           Data.Kraken.TickDataList
@@ -53,6 +54,8 @@ main = do
       res@(TickDataList gr l dats) <- mkReq $ GetOHLCData (OHLCDataConfig "ADAEUR" (Just H4) (Just $ secondsToDateTime 1633515697))
       liftIO $ print $ prettyTickDataList $ TickDataList gr l (map (\x -> x {tickData = take 2 (tickData x) ++ lastX 4 (tickData x)}) dats)
       liftIO $ putStrLn $ "Number TickData: " ++ show (map (length . tickData) dats)
+      res <- mkReq $ GetOrderBook (OrderBookConfig "ADAEUR" (Just 4))
+      liftIO $ print $ prettyOrderBookList res
       -- accs <- mkReq GetAccounts
       -- liftIO $ print accs
       -- forM_ (accounts accs) $ \prop -> do
