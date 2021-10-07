@@ -4,6 +4,9 @@
 module Data.Kraken.DateTime
     ( DateTime (..)
     , fromDateTime
+    , dateTimeToPOSIXTime
+    , posixTimeToDateTime
+    , secondsToDateTime
     , prettyDateTime
     ) where
 
@@ -11,6 +14,7 @@ import           Control.DeepSeq
 import           Data.Aeson
 import           Data.Serialize
 import           Data.Time
+import           Data.Time.Clock.POSIX
 import           Data.Time.Clock.Serialize ()
 import           Data.Time.RFC3339
 import           GHC.Generics
@@ -43,3 +47,15 @@ instance FromJSON DateTime where
 instance ToJSON DateTime where
   toJSON (DateTime Nothing)     = String "0"
   toJSON (DateTime (Just time)) = String $ formatTimeRFC3339 (utcToZonedTime utc time)
+
+
+dateTimeToPOSIXTime :: DateTime -> POSIXTime
+dateTimeToPOSIXTime (DateTime (Just time)) = utcTimeToPOSIXSeconds time
+dateTimeToPOSIXTime (DateTime Nothing)     = 0
+
+posixTimeToDateTime :: POSIXTime -> DateTime
+posixTimeToDateTime = DateTime . Just . posixSecondsToUTCTime
+
+
+secondsToDateTime :: Integer -> DateTime
+secondsToDateTime = posixTimeToDateTime . fromIntegral

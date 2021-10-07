@@ -24,8 +24,8 @@ data GetTradableAssetPairs =
 
 
 data TradableAssetPairsConfig = TradableAssetPairsConfig
-  { pair :: InstrumentName               -- ^ Example: pair=XXBTCZUSD,XETHXXBT
-  , info :: Maybe TradableAssetPairsInfo -- ^ Enum: "info" "leverage" "fees" "margin". Info to retrieve. (optional). Default: "info"
+  { tradableAssetPair     :: PairName                     -- ^ Example: pair=XXBTCZUSD,XETHXXBT
+  , tradableAssetPairInfo :: Maybe TradableAssetPairsInfo -- ^ Enum: "info" "leverage" "fees" "margin". Info to retrieve. (optional). Default: "info"
   } deriving (Show, Read, Eq, Ord)
 
 

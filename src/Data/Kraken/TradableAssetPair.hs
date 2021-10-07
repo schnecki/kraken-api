@@ -26,24 +26,24 @@ import           Data.Kraken.Util
 
 data TradableAssetPair
   = TradableAssetPair
-      { altname           :: InstrumentName       -- ^ Alternate pair name
-      , wsname            :: Maybe InstrumentName -- ^ WebSocket pair name (if available)
-      , aclassBase        :: AssetClass           -- ^ Asset class of base component
-      , base              :: InstrumentName       -- ^ Asset ID of base component
-      , aclassQuote       :: AssetClass           -- ^ Asset class of quote component
-      , quote             :: InstrumentName       -- ^ Asset ID of quote component
-      , lot               :: T.Text               -- ^ deprecated Volume lot size -- ^
-      , pairDecimals      :: Integer              -- ^ caling decimal places for pair
-      , lotDecimals       :: Integer              -- ^ Scaling decimal places for volume
-      , lotMultiplier     :: Integer              -- ^ Amount to multiply lot volume by to get currency volume
-      , leverageBuy       :: [Integer]            -- ^ Array of leverage amounts available when buying
-      , leverageSell      :: [Integer]            -- ^ Array of leverage amounts available when selling
-      , fees              :: [[Double]]           -- ^ Fee schedule array in [<volume>, <percent fee>] tuples
-      , feesMaker         :: [[Double]]           -- ^  Maker fee schedule array in [<volume>, <percent fee>] tuples (if on maker/taker)
-      , feeVolumeCurrency :: InstrumentName       -- ^ Volume discount currency
-      , marginCall        :: Integer              -- ^ Margin call level
-      , marginStop        :: Integer              -- ^ Stop-out/liquidation margin level
-      , ordermin          :: OrderMinimum               -- ^ Minimum order size (in terms of base currency)
+      { altname           :: PairName       -- ^ Alternate pair name
+      , wsname            :: Maybe PairName -- ^ WebSocket pair name (if available)
+      , aclassBase        :: AssetClass     -- ^ Asset class of base component
+      , base              :: PairName       -- ^ Asset ID of base component
+      , aclassQuote       :: AssetClass     -- ^ Asset class of quote component
+      , quote             :: PairName       -- ^ Asset ID of quote component
+      , lot               :: T.Text         -- ^ deprecated Volume lot size -- ^
+      , pairDecimals      :: Integer        -- ^ caling decimal places for pair
+      , lotDecimals       :: Integer        -- ^ Scaling decimal places for volume
+      , lotMultiplier     :: Integer        -- ^ Amount to multiply lot volume by to get currency volume
+      , leverageBuy       :: [Integer]      -- ^ Array of leverage amounts available when buying
+      , leverageSell      :: [Integer]      -- ^ Array of leverage amounts available when selling
+      , fees              :: [[Double]]     -- ^ Fee schedule array in [<volume>, <percent fee>] tuples
+      , feesMaker         :: [[Double]]     -- ^  Maker fee schedule array in [<volume>, <percent fee>] tuples (if on maker/taker)
+      , feeVolumeCurrency :: PairName       -- ^ Volume discount currency
+      , marginCall        :: Integer        -- ^ Margin call level
+      , marginStop        :: Integer        -- ^ Stop-out/liquidation margin level
+      , ordermin          :: OrderMinimum   -- ^ Minimum order size (in terms of base currency)
       }
   | TradableAssetPairLeverage
       { leverageBuy  :: [Integer] -- ^ Array of leverage amounts available when buying

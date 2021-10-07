@@ -68,30 +68,3 @@ prettyTickerInformationWith nesting info =
   where n1 = 2 * nestIndent
         n1Sum = nesting + n1
         n2 = nestCols - nesting
-
-
--- data TickerInfo' =
---   TickerInfo'
---     { a :: [T.Text] -- ^ Ask [<price>, <whole lot volume>, <lot volume>]
---     , b :: [T.Text] -- ^ Bid [<price>, <whole lot volume>, <lot volume>]
---     , c :: [T.Text] -- ^ Last trade closed [<price>, <lot volume>]
---     , v :: [T.Text] -- ^ Volume [<today>, <last 24 hours>]
---     , p :: [T.Text] -- ^ Volume weighted average price [<today>, <last 24 hours>]
---     , t :: [Int]    -- ^ Number of trades [<today>, <last 24 hours>]
---     , l :: [T.Text] -- ^ Low [<today>, <last 24 hours>]
---     , h :: [T.Text] -- ^ High [<today>, <last 24 hours>]
---     , o :: T.Text   -- ^ Today's opening price
---     }
---   deriving (Read, Show, Eq, Ord, Generic, NFData, Serialize)
-
-
--- toTickerInfo' :: TickerInfo -> TickerInfo'
--- toTickerInfo' = undefined
-
-
--- fromTickerInfo' :: TickerInfo' -> TickerInfo
--- fromTickerInfo' = undefined
-
-
--- instance ToJSON TickerInformation where
---    toJSON = genericToJSON jsonSnakeCase

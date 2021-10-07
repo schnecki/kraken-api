@@ -17,7 +17,7 @@ import           Request.Kraken.Class
 
 
 data GetTickerInformation =
-  GetTickerInformation InstrumentName -- ^ Pair name. Example: "ADAEUR"
+  GetTickerInformation PairName -- ^ Pair name. Example: "ADAEUR"
 
 instance Request KrakenConfig GetTickerInformation where
   type Method GetTickerInformation = GET
