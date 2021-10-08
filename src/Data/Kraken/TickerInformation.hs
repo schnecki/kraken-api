@@ -18,8 +18,8 @@ import           Text.PrettyPrint
 import           Data.Kraken.Candlestick
 import           Data.Kraken.CandlestickStats
 import           Data.Kraken.PriceValue
+import           Data.Kraken.TickerVolume
 import           Data.Kraken.TradeCount
-import           Data.Kraken.TradeVolume
 import           Data.Kraken.Util
 
 
@@ -28,8 +28,8 @@ data TickerInformation =
     { ask            :: Candlestick      -- ^ Ask [<price>, <whole lot volume>, <lot volume>]
     , bid            :: Candlestick      -- ^ Bid [<price>, <whole lot volume>, <lot volume>]
     , close          :: Candlestick      -- ^ Last trade closed [<price>, <lot volume>]
-    , volume         :: TradeVolume      -- ^ Volume [<today>, <last 24 hours>]
-    , volumeWeigthed :: TradeVolume      -- ^ Volume weighted average price [<today>, <last 24 hours>]
+    , volume         :: TickerVolume      -- ^ Volume [<today>, <last 24 hours>]
+    , volumeWeigthed :: TickerVolume      -- ^ Volume weighted average price [<today>, <last 24 hours>]
     , tradeCount     :: TradeCount       -- ^ Number of trades [<today>, <last 24 hours>]
     , low            :: CandlestickStats -- ^ Low [<today>, <last 24 hours>]
     , high           :: CandlestickStats -- ^ High [<today>, <last 24 hours>]
@@ -59,8 +59,8 @@ prettyTickerInformationWith nesting info =
   colName "ask"            $$ nest n1 (prettyCandlestickWith n1Sum $ ask info) $+$
   colName "bid"            $$ nest n1 (prettyCandlestickWith n1Sum $ bid info) $+$
   colName "close"          $$ nest n1 (prettyCandlestickWith n1Sum $ close info) $+$
-  colName "volume"         $$ nest n1 (prettyTradeVolumeWith n1Sum $ volume info) $+$
-  colName "volumeWeigthed" $$ nest n1 (prettyTradeVolumeWith n1Sum $ volumeWeigthed info) $+$
+  colName "volume"         $$ nest n1 (prettyTickerVolumeWith n1Sum $ volume info) $+$
+  colName "volumeWeigthed" $$ nest n1 (prettyTickerVolumeWith n1Sum $ volumeWeigthed info) $+$
   colName "tradeCount"     $$ nest n1 (prettyTradeCountWith  n1Sum $ tradeCount info) $+$
   colName "low"            $$ nest n1 (prettyCandlestickStatsWith n1Sum $ low info) $+$
   colName "high"           $$ nest n1 (prettyCandlestickStatsWith n1Sum $ high info) $+$

@@ -42,7 +42,7 @@ instance Read DateTime where
 
 instance FromJSON DateTime where
   parseJSON (String v) = return $ DateTime $ zonedTimeToUTC <$> parseTimeRFC3339 v
-  parseJSON v = fail $ "Cannot parse non string to UTCTime (value was '" ++ show v ++ "') in parseJSON of DateTime"
+  parseJSON v          = fail $ "Cannot parse non string to UTCTime (value was '" ++ show v ++ "') in parseJSON of DateTime"
 
 instance ToJSON DateTime where
   toJSON (DateTime Nothing)     = String "0"

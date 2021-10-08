@@ -11,3 +11,4 @@ import           Request.Kraken.ServerTimeGET         as R
 import           Request.Kraken.SystemStatusGET       as R
 import           Request.Kraken.TickerInformationGET  as R
 import           Request.Kraken.TradableAssetPairsGET as R
+import           Request.Kraken.TradesGET             as R

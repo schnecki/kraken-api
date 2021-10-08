@@ -1,9 +1,9 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric  #-}
-module Data.Kraken.TradeVolume
-    ( TradeVolume (..)
-    , prettyTradeVolume
-    , prettyTradeVolumeWith
+module Data.Kraken.TickerVolume
+    ( TickerVolume (..)
+    , prettyTickerVolume
+    , prettyTickerVolumeWith
     ) where
 
 import           Control.DeepSeq
@@ -18,24 +18,24 @@ import           Text.PrettyPrint
 import           Data.Kraken.Util
 
 
-data TradeVolume =
-  TradeVolume
-    { today       :: Double       -- ^ Today
+data TickerVolume =
+  TickerVolume
+    { today       :: Double -- ^ Today
     , last24Hours :: Double -- ^ Last 24 Hours
     }
   deriving (Show, Read, Eq, Ord, Serialize, Generic, ToJSON, NFData)
 
-instance FromJSON TradeVolume where
+instance FromJSON TickerVolume where
   parseJSON =
-    withArray "Data.Kraken.TradeVolume" $ \arr -> do
+    withArray "Data.Kraken.TickerVolume" $ \arr -> do
       unless (V.length arr == 2) $ fail ("Expected array of length 2, encountedered: " ++ show arr)
-      TradeVolume <$> (parseJSON =<< parseStrToNum (arr V.! 0)) <*> (parseJSON =<< parseStrToNum (arr V.! 1))
+      TickerVolume <$> (parseJSON =<< parseStrToNum (arr V.! 0)) <*> (parseJSON =<< parseStrToNum (arr V.! 1))
 
-prettyTradeVolume :: TradeVolume -> Doc
-prettyTradeVolume = prettyTradeVolumeWith 0
+prettyTickerVolume :: TickerVolume -> Doc
+prettyTickerVolume = prettyTickerVolumeWith 0
 
-prettyTradeVolumeWith :: Int -> TradeVolume -> Doc
-prettyTradeVolumeWith nesting (TradeVolume t l24) =
+prettyTickerVolumeWith :: Int -> TickerVolume -> Doc
+prettyTickerVolumeWith nesting (TickerVolume t l24) =
   colName "today"           $$ nest n2 (double t) $+$
   colName "last 24 hours"   $$ nest n2 (double l24)
   where n2 = nestCols - nesting

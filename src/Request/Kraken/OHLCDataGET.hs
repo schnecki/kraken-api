@@ -29,7 +29,7 @@ data GetOHLCData =
 data OHLCDataConfig = OHLCDataConfig
   { ohlcDataPair     :: PairName                     -- ^ Example: pair=XXBTCZUSD,XETHXXBT
   , ohlcDataInterval :: Maybe CandlestickGranularity -- ^ Time frame interval in minutes. Example: interval=60.
-  , ohlcDataSince    :: Maybe DateTime               -- ^ Return committed OHLC data since given ID. Since=1548111600.
+  , ohlcDataSince    :: Maybe DateTime               -- ^ Return committed OHLC data since given ID. Example: Since=1548111600.
   } deriving (Show, Read, Eq, Ord)
 
 

@@ -26,6 +26,8 @@ import           Data.Kraken.TickDataList
 import           Data.Kraken.TickDataObject
 import           Data.Kraken.TickerInformationList
 import           Data.Kraken.TradableAssetPairList
+import           Data.Kraken.TradeList
+import           Data.Kraken.TradeObject
 import           KrakenApi
 
 main :: IO ()
@@ -56,6 +58,8 @@ main = do
       liftIO $ putStrLn $ "Number TickData: " ++ show (map (length . tickData) dats)
       res <- mkReq $ GetOrderBook (OrderBookConfig "ADAEUR" (Just 4))
       liftIO $ print $ prettyOrderBookList res
+      TradeList l' res <- mkReq $ GetTrades (TradesConfig "ADAEUR" Nothing)
+      liftIO $ print $ prettyTradeList $ TradeList l' (map (\x -> x { trades = take 2 (trades x) ++ lastX 3 (trades x)}) res)
       -- accs <- mkReq GetAccounts
       -- liftIO $ print accs
       -- forM_ (accounts accs) $ \prop -> do

@@ -28,7 +28,7 @@ data CandlestickStats =
 
 instance FromJSON CandlestickStats where
   parseJSON =
-    withArray "Data.Kraken.TradeVolume" $ \arr -> do
+    withArray "Data.Kraken.CandlestickStats" $ \arr -> do
       unless (V.length arr == 2) $ fail ("Expected array of length 2, encountedered: " ++ show arr)
       CandlestickStats <$> (parseJSON =<< parseStrToNum (arr V.! 0)) <*> (parseJSON =<< parseStrToNum (arr V.! 1))
 
