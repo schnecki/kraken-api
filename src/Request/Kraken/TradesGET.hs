@@ -23,7 +23,7 @@ data GetTrades =
 
 data TradesConfig = TradesConfig
   { tradesPair  :: PairName                     -- ^ Example: pair=XXBTCZUSD,XETHXXBT
-  , tradesSince :: Maybe DateTime               -- ^ Return committed Trades data since given ID. Example: Since=1548111600.
+  , tradesSince :: Maybe Integer                -- ^ Return committed Trades data since given ID. Example: Since=1548111600.
   } deriving (Show, Read, Eq, Ord)
 
 
@@ -40,7 +40,7 @@ instance Request KrakenConfig GetTrades where
     where
       configs =
         "pair"  =:                p <>
-        "since"    `maybeQueryParam` fmap dateTimeToPOSIXTime mSince
+        "since"    `maybeQueryParam` fmap show mSince
   process _ _ resp = fromRequestResult (responseBody resp)
 
 

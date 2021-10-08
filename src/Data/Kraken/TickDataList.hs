@@ -25,7 +25,7 @@ import           Data.Kraken.Util
 data TickDataList =
   TickDataList
     { tickGranularity :: Maybe CandlestickGranularity
-    , tickLast        :: DateTime
+    , tickLast        :: Integer
     , tickDatas       :: [TickDataObject]
     }
   deriving (Read, Show, Eq, Ord, Generic, NFData, Serialize)
@@ -34,7 +34,7 @@ data TickDataList =
 instance FromJSON TickDataList where
   parseJSON =
     withObject "Data.Kraken.TickDataList" $ \o -> do
-      last' <- secondsToDateTime <$> o .: "last"
+      last' <- parseJSON =<< parseStrToNum =<< (o .: "last")
       datas <- mapM (withArray "Data.Kraken.TickDataList parsing TickData" $ \o' -> V.toList <$> mapM parseJSON o') (mkElems o)
       return $ TickDataList Nothing last' $ zipWith TickDataObject (mkKeys o) datas
     where
@@ -48,5 +48,5 @@ setTickDataListGranularity g x = x {tickGranularity = Just g}
 prettyTickDataList :: TickDataList -> Doc
 prettyTickDataList (TickDataList mGran lst xs) =
   mVal mGran (\v -> colName "Tick Granularity" $$ nest nestCols (text $ show v)) $+$
-  colName "Tick Last Date" $$ nest nestCols (prettyDateTime lst) $+$
+  colName "Tick Last ID" $$ nest nestCols (integer $ lst) $+$
   vcat (map prettyTickDataObject xs)

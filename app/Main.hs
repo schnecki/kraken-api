@@ -21,6 +21,8 @@ import           Data.Kraken.CandlestickGranularity
 import           Data.Kraken.DateTime
 import           Data.Kraken.OrderBookList
 import           Data.Kraken.ServerTime
+import           Data.Kraken.SpreadList
+import           Data.Kraken.SpreadObject
 import           Data.Kraken.SystemStatus
 import           Data.Kraken.TickDataList
 import           Data.Kraken.TickDataObject
@@ -53,13 +55,15 @@ main = do
       liftIO $ enableRequestLogging (LogFile "borl-trader.log") LogDebug
       res <- mkReq $ GetTickerInformation "ADAEUR"
       liftIO $ print $ prettyTickerInformationList res
-      res@(TickDataList gr l dats) <- mkReq $ GetOHLCData (OHLCDataConfig "ADAEUR" (Just H4) (Just $ secondsToDateTime 1633515697))
+      res@(TickDataList gr l dats) <- mkReq $ GetOHLCData (OHLCDataConfig "ADAEUR" (Just H4) (Just 1633515697))
       liftIO $ print $ prettyTickDataList $ TickDataList gr l (map (\x -> x {tickData = take 2 (tickData x) ++ lastX 4 (tickData x)}) dats)
       liftIO $ putStrLn $ "Number TickData: " ++ show (map (length . tickData) dats)
       res <- mkReq $ GetOrderBook (OrderBookConfig "ADAEUR" (Just 4))
       liftIO $ print $ prettyOrderBookList res
       TradeList l' res <- mkReq $ GetTrades (TradesConfig "ADAEUR" Nothing)
       liftIO $ print $ prettyTradeList $ TradeList l' (map (\x -> x { trades = take 2 (trades x) ++ lastX 3 (trades x)}) res)
+      SpreadList l' res <- mkReq $ GetRecentSpreads (RecentSpreadsConfig "ADAEUR" Nothing)
+      liftIO $ print $ prettySpreadList $ SpreadList l' (map (\x -> x { spreads = take 2 (spreads x) ++ lastX 3 (spreads x)}) res)
       -- accs <- mkReq GetAccounts
       -- liftIO $ print accs
       -- forM_ (accounts accs) $ \prop -> do

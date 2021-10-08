@@ -20,12 +20,9 @@ import           Text.PrettyPrint
 
 import           Data.Kraken.DateTime
 import           Data.Kraken.PriceValue
-import           Data.Kraken.TickerVolume
 import           Data.Kraken.TradeOrderType
 import           Data.Kraken.TradeType
 import           Data.Kraken.Util
-
-import           Debug.Trace
 
 data Trade =
   Trade
