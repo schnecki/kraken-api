@@ -36,7 +36,7 @@ instance Request KrakenConfig GetRecentSpreads where
   url cfg GetRecentSpreads {} = baseUrl cfg /: "public" /: "Spread"
   body _ GetRecentSpreads {} = NoReqBody
   response _ GetRecentSpreads {} = jsonResponse
-  option _ (GetRecentSpreads (RecentSpreadsConfig p mSince)) = headerRFC3339DatetimeFormat <> configs
+  option _ (GetRecentSpreads (RecentSpreadsConfig p mSince)) = return $ headerRFC3339DatetimeFormat <> configs
     where
       configs =
         "pair"  =:                   p <>

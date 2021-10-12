@@ -28,7 +28,7 @@ instance Request KrakenConfig GetTickerInformation where
   url cfg GetTickerInformation {} = baseUrl cfg /: "public" /: "Ticker"
   body _ GetTickerInformation {} = NoReqBody
   response _ GetTickerInformation {} = jsonResponse
-  option _ (GetTickerInformation pair) = headerRFC3339DatetimeFormat <> configs
+  option _ (GetTickerInformation pair) = return $ headerRFC3339DatetimeFormat <> configs
     where
       configs = "pair" =: pair
   process _ GetTickerInformation {} resp = fromRequestResult $ responseBody resp

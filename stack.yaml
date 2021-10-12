@@ -42,8 +42,8 @@ packages:
 # using the same syntax as the packages field.
 # (e.g., acme-missiles-0.3)
 extra-deps:
-- git: https://github.com/GetShopTV/cereal-time.git
-  commit: ee0c52b175a8c6e93225f62146c0380dca6053ae
+  - git: https://github.com/GetShopTV/cereal-time.git
+    commit: ee0c52b175a8c6e93225f62146c0380dca6053ae
 
 
 # Override default flag values for local packages and extra-deps

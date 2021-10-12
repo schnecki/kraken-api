@@ -32,7 +32,7 @@ instance Request KrakenConfig GetAssetInfo where
   url cfg GetAssetInfo {} = baseUrl cfg /: "public" /: "Assets"
   body _ GetAssetInfo {} = NoReqBody
   response _ GetAssetInfo {} = jsonResponse
-  option _ (GetAssetInfo instr mAclass) = headerRFC3339DatetimeFormat <> configs
+  option _ (GetAssetInfo instr mAclass) = return $ headerRFC3339DatetimeFormat <> configs
     where
       configs =
         "asset"  =:                instr <>

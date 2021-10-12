@@ -36,7 +36,7 @@ instance Request KrakenConfig GetTrades where
   url cfg GetTrades {} = baseUrl cfg /: "public" /: "Trades"
   body _ GetTrades {} = NoReqBody
   response _ GetTrades {} = jsonResponse
-  option _ (GetTrades (TradesConfig p mSince)) = headerRFC3339DatetimeFormat <> configs
+  option _ (GetTrades (TradesConfig p mSince)) = return $ headerRFC3339DatetimeFormat <> configs
     where
       configs =
         "pair"  =:                p <>

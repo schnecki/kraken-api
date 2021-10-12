@@ -42,7 +42,7 @@ instance Request KrakenConfig GetOHLCData where
   url cfg GetOHLCData {} = baseUrl cfg /: "public" /: "OHLC"
   body _ GetOHLCData {} = NoReqBody
   response _ GetOHLCData {} = jsonResponse
-  option _ (GetOHLCData (OHLCDataConfig p mInt mSince)) = headerRFC3339DatetimeFormat <> configs
+  option _ (GetOHLCData (OHLCDataConfig p mInt mSince)) = return $ headerRFC3339DatetimeFormat <> configs
     where
       configs =
         "pair"  =:                   p <>

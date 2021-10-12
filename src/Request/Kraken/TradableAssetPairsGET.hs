@@ -46,7 +46,7 @@ instance Request KrakenConfig GetTradableAssetPairs where
   url cfg GetTradableAssetPairs {} = baseUrl cfg /: "public" /: "AssetPairs"
   body _ GetTradableAssetPairs {} = NoReqBody
   response _ GetTradableAssetPairs {} = jsonResponse
-  option _ (GetTradableAssetPairs (TradableAssetPairsConfig p i)) = headerRFC3339DatetimeFormat <> configs
+  option _ (GetTradableAssetPairs (TradableAssetPairsConfig p i)) = return $ headerRFC3339DatetimeFormat <> configs
     where
       configs =
         "pair"  =:               p <>

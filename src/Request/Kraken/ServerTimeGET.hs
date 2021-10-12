@@ -26,5 +26,5 @@ instance Request KrakenConfig GetServerTime where
   url cfg GetServerTime = baseUrl cfg /: "public" /: "Time"
   body _ GetServerTime {} = NoReqBody
   response _ GetServerTime {} = jsonResponse
-  option _ GetServerTime {} = headerRFC3339DatetimeFormat
+  option _ GetServerTime {} = return headerRFC3339DatetimeFormat
   process _ GetServerTime {} resp = fromRequestResult $ responseBody resp

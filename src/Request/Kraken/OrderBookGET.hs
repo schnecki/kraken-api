@@ -37,7 +37,7 @@ instance Request KrakenConfig GetOrderBook where
   url cfg GetOrderBook {} = baseUrl cfg /: "public" /: "Depth"
   body _ GetOrderBook {} = NoReqBody
   response _ GetOrderBook {} = jsonResponse
-  option _ (GetOrderBook (OrderBookConfig p mInt)) = headerRFC3339DatetimeFormat <> configs
+  option _ (GetOrderBook (OrderBookConfig p mInt)) = return $ headerRFC3339DatetimeFormat <> configs
     where
       configs =
         "pair"  =:                p <>

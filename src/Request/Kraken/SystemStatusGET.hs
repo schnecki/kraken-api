@@ -26,5 +26,5 @@ instance Request KrakenConfig GetSystemStatus where
   url cfg GetSystemStatus = baseUrl cfg /: "public" /: "SystemStatus"
   body _ GetSystemStatus {} = NoReqBody
   response _ GetSystemStatus {} = jsonResponse
-  option _ GetSystemStatus {} = headerRFC3339DatetimeFormat
+  option _ GetSystemStatus {} = return headerRFC3339DatetimeFormat
   process _ GetSystemStatus {} resp = fromRequestResult $ responseBody resp

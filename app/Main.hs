@@ -39,7 +39,9 @@ main = do
   $(logInfo) ("Starting App" :: T.Text)
   apiKey <- C.filter (/= '\n') <$> B.readFile "API_KEY"
   putStrLn $ "API_KEY: " <> show apiKey
-  let cfg = krakenConfigTradeAccount apiKey
+  prApiKey <- C.filter (/= '\n') <$> B.readFile "API_KEY_PRIVATE"
+  putStrLn $ "API_KEY_PRIVATE: " <> show prApiKey
+  let cfg = krakenConfigTradeAccount apiKey prApiKey Nothing
       lastX x = reverse . take x . reverse
   res <-
     runSessReqWithParamsM (additionalParams cfg) cfg $
