@@ -2,7 +2,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE TypeFamilies          #-}
-module Request.Kraken.TradesGET
+module Request.Kraken.GetTradesGET
   ( GetTrades(..)
   , TradesConfig (..)
   ) where

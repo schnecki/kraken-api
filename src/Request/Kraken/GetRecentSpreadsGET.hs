@@ -2,7 +2,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings     #-}
 {-# LANGUAGE TypeFamilies          #-}
-module Request.Kraken.RecentSpreadsGET
+module Request.Kraken.GetRecentSpreadsGET
   ( GetRecentSpreads(..)
   , RecentSpreadsConfig (..)
   ) where

@@ -17,7 +17,6 @@ import           GHC.Generics
 import           Text.PrettyPrint
 
 import           Data.Kraken.CandlestickGranularity
-import           Data.Kraken.DateTime
 import           Data.Kraken.TickDataObject
 import           Data.Kraken.Util
 
@@ -35,7 +34,7 @@ instance FromJSON TickDataList where
   parseJSON =
     withObject "Data.Kraken.TickDataList" $ \o -> do
       last' <- parseJSON =<< parseStrToNum =<< (o .: "last")
-      datas <- mapM (withArray "Data.Kraken.TickDataList parsing TickData" $ \o' -> V.toList <$> mapM parseJSON o') (mkElems o)
+      datas <- mapM (withArray "Data.Kraken.TickDataList parsing TickData" (fmap V.toList . mapM parseJSON)) (mkElems o)
       return $ TickDataList Nothing last' $ zipWith TickDataObject (mkKeys o) datas
     where
       mkKeys o = filter (/= "last") (HM.keys o)
@@ -48,5 +47,5 @@ setTickDataListGranularity g x = x {tickGranularity = Just g}
 prettyTickDataList :: TickDataList -> Doc
 prettyTickDataList (TickDataList mGran lst xs) =
   mVal mGran (\v -> colName "Tick Granularity" $$ nest nestCols (text $ show v)) $+$
-  colName "Tick Last ID" $$ nest nestCols (integer $ lst) $+$
+  colName "Tick Last ID" $$ nest nestCols (integer lst) $+$
   vcat (map prettyTickDataObject xs)

@@ -4,7 +4,7 @@
 {-# LANGUAGE TypeFamilies          #-}
 
 
-module Request.Kraken.ServerTimeGET
+module Request.Kraken.GetServerTimeGET
   ( GetServerTime(..)
   ) where
 

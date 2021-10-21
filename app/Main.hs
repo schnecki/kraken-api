@@ -29,6 +29,7 @@ import           Data.Kraken.TickDataList
 import           Data.Kraken.TickDataObject
 import           Data.Kraken.TickerInformationList
 import           Data.Kraken.TradableAssetPairList
+import           Data.Kraken.TradeBalance
 import           Data.Kraken.TradeList
 import           Data.Kraken.TradeObject
 import           KrakenApi
@@ -47,28 +48,30 @@ main = do
   res <-
     runSessReqWithParamsM (additionalParams cfg) cfg $
     runRequests $ do
-      -- res <- mkReq GetServerTime
-      -- liftIO $ print $ prettyServerTime res
-      -- res <- mkReq GetSystemStatus
-      -- liftIO $ print $ prettySystemStatus res
-      -- res <- mkReq $ GetAssetInfo "INJ,ADA" Nothing
-      -- liftIO $ print $ prettyAssetInfoList res
-      -- res <- mkReq $ GetTradableAssetPairs (TradableAssetPairsConfig "ADAEUR" (Just Info))
-      -- liftIO $ print $ prettyTradableAssetPairList res
-      -- liftIO $ enableRequestLogging (LogFile "borl-trader.log") LogDebug
-      -- res <- mkReq $ GetTickerInformation "ADAEUR"
-      -- liftIO $ print $ prettyTickerInformationList res
-      -- res@(TickDataList gr l dats) <- mkReq $ GetOHLCData (OHLCDataConfig "ADAEUR" (Just H4) (Just 1633515697))
-      -- liftIO $ print $ prettyTickDataList $ TickDataList gr l (map (\x -> x {tickData = take 2 (tickData x) ++ lastX 4 (tickData x)}) dats)
-      -- liftIO $ putStrLn $ "Number TickData: " ++ show (map (length . tickData) dats)
-      -- res <- mkReq $ GetOrderBook (OrderBookConfig "ADAEUR" (Just 4))
-      -- liftIO $ print $ prettyOrderBookList res
-      -- TradeList l' res <- mkReq $ GetTrades (TradesConfig "ADAEUR" Nothing)
-      -- liftIO $ print $ prettyTradeList $ TradeList l' (map (\x -> x { trades = take 2 (trades x) ++ lastX 3 (trades x)}) res)
-      -- SpreadList l' res <- mkReq $ GetRecentSpreads (RecentSpreadsConfig "ADAEUR" Nothing)
-      -- liftIO $ print $ prettySpreadList $ SpreadList l' (map (\x -> x { spreads = take 2 (spreads x) ++ lastX 3 (spreads x)}) res)
-      accBalLs <- mkReq PostAccountBalance
+      res <- mkReq GetServerTime
+      liftIO $ print $ prettyServerTime res
+      res <- mkReq GetSystemStatus
+      liftIO $ print $ prettySystemStatus res
+      res <- mkReq $ GetAssetInfo "INJ,ADA" Nothing
+      liftIO $ print $ prettyAssetInfoList res
+      res <- mkReq $ GetTradableAssetPairs (TradableAssetPairsConfig "ADAEUR" (Just Info))
+      liftIO $ print $ prettyTradableAssetPairList res
+      liftIO $ enableRequestLogging (LogFile "borl-trader.log") LogDebug
+      res <- mkReq $ GetTickerInformation "ADAEUR"
+      liftIO $ print $ prettyTickerInformationList res
+      res@(TickDataList gr l dats) <- mkReq $ GetOHLCData (OHLCDataConfig "ADAEUR" (Just H4) (Just 1633515697))
+      liftIO $ print $ prettyTickDataList $ TickDataList gr l (map (\x -> x {tickData = take 2 (tickData x) ++ lastX 4 (tickData x)}) dats)
+      liftIO $ putStrLn $ "Number TickData: " ++ show (map (length . tickData) dats)
+      res <- mkReq $ GetOrderBook (OrderBookConfig "ADAEUR" (Just 4))
+      liftIO $ print $ prettyOrderBookList res
+      TradeList l' res <- mkReq $ GetTrades (TradesConfig "ADAEUR" Nothing)
+      liftIO $ print $ prettyTradeList $ TradeList l' (map (\x -> x { trades = take 2 (trades x) ++ lastX 3 (trades x)}) res)
+      SpreadList l' res <- mkReq $ GetRecentSpreads (RecentSpreadsConfig "ADAEUR" Nothing)
+      liftIO $ print $ prettySpreadList $ SpreadList l' (map (\x -> x { spreads = take 2 (spreads x) ++ lastX 3 (spreads x)}) res)
+      accBalLs <- mkReq GetAccountBalance
       liftIO $ print $ prettyAccountBalanceList accBalLs
+      trBal <- mkReq $ GetTradeBalance (Just "ZUSD")
+      liftIO $ print $ prettyTradeBalance trBal
       -- accs <- mkReq GetAccounts
       -- liftIO $ print accs
       -- forM_ (accounts accs) $ \prop -> do

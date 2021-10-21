@@ -4,7 +4,7 @@
 {-# LANGUAGE TypeFamilies          #-}
 
 
-module Request.Kraken.AssetInfoGET
+module Request.Kraken.GetAssetInfoGET
   ( GetAssetInfo(..)
   ) where
 

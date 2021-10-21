@@ -4,7 +4,7 @@
 {-# LANGUAGE TypeFamilies          #-}
 
 
-module Request.Kraken.OrderBookGET
+module Request.Kraken.GetOrderBookGET
   ( GetOrderBook(..)
   , OrderBookConfig (..)
   ) where

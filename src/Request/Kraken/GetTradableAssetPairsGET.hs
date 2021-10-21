@@ -4,7 +4,7 @@
 {-# LANGUAGE TypeFamilies          #-}
 
 
-module Request.Kraken.TradableAssetPairsGET
+module Request.Kraken.GetTradableAssetPairsGET
   ( GetTradableAssetPairs(..)
   , TradableAssetPairsConfig (..)
   , TradableAssetPairsInfo (..)

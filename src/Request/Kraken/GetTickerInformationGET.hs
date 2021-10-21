@@ -4,7 +4,7 @@
 {-# LANGUAGE TypeFamilies          #-}
 
 
-module Request.Kraken.TickerInformationGET
+module Request.Kraken.GetTickerInformationGET
   ( GetTickerInformation(..)
   ) where
 

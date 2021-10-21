@@ -4,7 +4,7 @@
 {-# LANGUAGE TypeFamilies          #-}
 
 
-module Request.Kraken.OHLCDataGET
+module Request.Kraken.GetOHLCDataGET
   ( GetOHLCData(..)
   , OHLCDataConfig (..)
   ) where

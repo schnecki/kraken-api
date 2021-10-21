@@ -2,15 +2,16 @@ module Request.Kraken
     ( module R
     ) where
 
-import           Request.Kraken.Class                 as R
+import           Request.Kraken.Class                    as R
 
-import           Request.Kraken.AccountBalancePOST    as R
-import           Request.Kraken.AssetInfoGET          as R
-import           Request.Kraken.OHLCDataGET           as R
-import           Request.Kraken.OrderBookGET          as R
-import           Request.Kraken.RecentSpreadsGET      as R
-import           Request.Kraken.ServerTimeGET         as R
-import           Request.Kraken.SystemStatusGET       as R
-import           Request.Kraken.TickerInformationGET  as R
-import           Request.Kraken.TradableAssetPairsGET as R
-import           Request.Kraken.TradesGET             as R
+import           Request.Kraken.GetAccountBalancePOST    as R
+import           Request.Kraken.GetAssetInfoGET          as R
+import           Request.Kraken.GetOHLCDataGET           as R
+import           Request.Kraken.GetOrderBookGET          as R
+import           Request.Kraken.GetRecentSpreadsGET      as R
+import           Request.Kraken.GetServerTimeGET         as R
+import           Request.Kraken.GetSystemStatusGET       as R
+import           Request.Kraken.GetTickerInformationGET  as R
+import           Request.Kraken.GetTradableAssetPairsGET as R
+import           Request.Kraken.GetTradeBalancePOST      as R
+import           Request.Kraken.GetTradesGET             as R

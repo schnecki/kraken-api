@@ -55,10 +55,9 @@ dependencies:
 - HTTP
 - cryptohash-sha256
 - cryptohash-sha512
-# - base64-bytestring
+- base64-bytestring
 - base16-bytestring
-- base64
-
+- binary
 
 library:
   source-dirs: src

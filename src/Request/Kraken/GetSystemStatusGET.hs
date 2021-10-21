@@ -4,7 +4,7 @@
 {-# LANGUAGE TypeFamilies          #-}
 
 
-module Request.Kraken.SystemStatusGET
+module Request.Kraken.GetSystemStatusGET
   ( GetSystemStatus(..)
   ) where
 
