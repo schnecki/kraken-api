@@ -51,9 +51,14 @@ dependencies:
 - cereal-time
 - vector
 - scientific
-- SHA
 - case-insensitive
-- base64-bytestring
+- HTTP
+- cryptohash-sha256
+- cryptohash-sha512
+# - base64-bytestring
+- base16-bytestring
+- base64
+
 
 library:
   source-dirs: src

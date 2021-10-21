@@ -4,6 +4,7 @@ module Request.Kraken
 
 import           Request.Kraken.Class                 as R
 
+import           Request.Kraken.AccountBalancePOST    as R
 import           Request.Kraken.AssetInfoGET          as R
 import           Request.Kraken.OHLCDataGET           as R
 import           Request.Kraken.OrderBookGET          as R
