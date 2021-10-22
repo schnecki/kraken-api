@@ -1,15 +1,15 @@
-{-# LANGUAGE DeriveAnyClass    #-}
-{-# LANGUAGE DeriveGeneric     #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric  #-}
 module Data.Kraken.SystemStatusType
     ( SystemStatusType (..)
-
+    , prettySystemStatusType
     ) where
 
 import           Control.DeepSeq
 import           Data.Aeson
 import           Data.Serialize
 import           GHC.Generics
+import           Text.PrettyPrint
 
 import           Data.Kraken.Util
 
@@ -26,3 +26,7 @@ instance ToJSON SystemStatusType where
 
 instance FromJSON SystemStatusType where
   parseJSON = genericParseJSON jsonSnakeCase
+
+
+prettySystemStatusType :: SystemStatusType -> Doc
+prettySystemStatusType = text . show
