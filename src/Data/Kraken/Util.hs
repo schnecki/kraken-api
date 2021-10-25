@@ -13,6 +13,8 @@ module Data.Kraken.Util
     , tshow
     , hsepWith
     , hsepComma
+    , prettyText
+    , prettyDouble
     ) where
 
 import           Data.Aeson
@@ -27,7 +29,7 @@ import           Text.Read         (readMaybe)
 parseStrToNum :: Value -> Parser Value
 parseStrToNum (String v) = maybe (fail $ "Could not convert string to Number. String: " ++ show v) (return . Number) (readMaybe $ T.unpack v)
 parseStrToNum x@Number{} = return x
-parseStrToNum v = fail $ "Expected string of number or number, but encountered : " ++ show v
+parseStrToNum v          = fail $ "Expected string of number or number, but encountered : " ++ show v
 
 jsonSnakeCase :: Options
 jsonSnakeCase = defaultOptions { constructorTagModifier = snakeCase, fieldLabelModifier = snakeCase }
@@ -64,3 +66,9 @@ mDefVal _ (Just v) line = line v
 
 tshow :: (Show a) => a -> T.Text
 tshow = T.pack . show
+
+prettyText :: T.Text -> Doc
+prettyText = text . T.unpack
+
+prettyDouble :: Double -> Doc
+prettyDouble = double

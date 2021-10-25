@@ -8,6 +8,7 @@
 
 module Request.Kraken.GetOpenOrdersPOST
   ( GetOpenOrders(..)
+  , OpenOrdersConfig (..)
   ) where
 
 import           ApiMaker
@@ -23,25 +24,23 @@ import           Data.Kraken.Types
 import           Request.Kraken.Class
 
 
-newtype GetOpenOrders = GetOpenOrders
-                          (Maybe InstrumentName) -- ^Base asset used to determine balance. Default: "ZUSD"
+newtype GetOpenOrders = GetOpenOrders OpenOrdersConfig
 
-newtype OpenOrdersPOST = OpenOrdersPOST
-  { asset :: Maybe InstrumentName
-  } deriving (Show, Eq, Ord, ToJSON, Generic, NFData)
+data OpenOrdersConfig = OpenOrdersConfig
+  { trades  :: Maybe Bool      -- ^  Whether or not to include trades related to position in output. Default: false.
+  , userref :: Maybe Int -- ^ Restrict results to given user reference id
+  } deriving (Show, Read, Eq, Ord, Generic, ToJSON)
 
 
 instance Request KrakenConfig GetOpenOrders where
   type Method GetOpenOrders = POST
-  type Body GetOpenOrders = ReqBodyJson OpenOrdersPOST
+  type Body GetOpenOrders = ReqBodyJson OpenOrdersConfig
   type Response GetOpenOrders = JsonResponse (RequestResult OpenOrderList)
   type Output GetOpenOrders = OpenOrderList
   method _ GetOpenOrders {} = POST
   url cfg GetOpenOrders {} = baseUrl cfg /: "private" /: "OpenOrders"
-  body _ (GetOpenOrders mInstr) = ReqBodyJson (OpenOrdersPOST mInstr)
+  body _ (GetOpenOrders config) = ReqBodyJson config
   response _ GetOpenOrders {} = jsonResponse
   requestModifier = addNonceAndApiSign
   option _ GetOpenOrders{} = return headerRFC3339DatetimeFormat
-  process _ (GetOpenOrders mInstr) resp = setBaseAsset <$> fromRequestResult (responseBody resp)
-    where
-      setBaseAsset tb = tb {baseAsset = mInstr <|> Just "ZUSD"}
+  process _ GetOpenOrders{} resp = fromRequestResult (responseBody resp)

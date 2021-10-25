@@ -20,6 +20,11 @@ import           Data.Kraken.Util
 data TradeOrderType
   = Market
   | Limit
+  | StopLoss
+  | TakeProfit
+  | StopLossLimit
+  | TakeProfitLimit
+  | SettlePosition
   deriving (Read, Show, Eq, Ord, Generic, NFData, Serialize)
 
 instance ToJSON TradeOrderType where
@@ -29,11 +34,16 @@ instance FromJSON TradeOrderType where
   parseJSON =
     withText "Data.Kraken.TradeOrderType" $ \s ->
       case T.toLower s of
-        "market" -> return Market
-        "m"      -> return Market
-        "limit"  -> return Limit
-        "l"      -> return Limit
-        _        -> fail $ "unexpected string in parseJSON in Data.Kraken.TradeOrderType: " ++ show s
+        "market"            -> return Market
+        "m"                 -> return Market
+        "limit"             -> return Limit
+        "l"                 -> return Limit
+        "stop-loss"         -> return StopLoss
+        "take-profit"       -> return TakeProfit
+        "stop-loss-limit"   -> return StopLossLimit
+        "take-profit-limit" -> return TakeProfitLimit
+        "settle-position"   -> return SettlePosition
+        _                   -> fail $ "unexpected string in parseJSON in Data.Kraken.TradeOrderType: " ++ show s
 
 
 prettyTradeOrderType :: TradeOrderType -> Doc

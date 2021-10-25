@@ -30,14 +30,8 @@ data OpenOrderList =
 instance FromJSON OpenOrderList where
   parseJSON =
     withObject "Data.Kraken.OpenOrderList" $ \o -> do
-      open' <- parseJSON =<< parseStrToNum =<< (o .: "last")
-      datas <- mapM (withArray "Data.Kraken.OpenOrderList parsing OpenOrder" (fmap V.toList . mapM parseJSON)) (mkElems o)
-      return $ OpenOrderList $ zipWith OpenOrderObject (mkKeys o) datas
-    where
-      mkKeys o = filter (/= "last") (HM.keys o)
-      mkElems o = HM.elems $ HM.filterWithKey (\k _ -> k /= "last") o
+      datas <- mapM parseJSON (HM.elems o)
+      return $ OpenOrderList $ zipWith OpenOrderObject (HM.keys o) datas
 
 prettyOpenOrderList :: OpenOrderList -> Doc
-prettyOpenOrderList (OpenOrderList xs) = colName "Open Orders" $$ nest n2 (prettyOpenOrderObject lst)
-  where
-    n2 = nestCols - nesting
+prettyOpenOrderList (OpenOrderList xs) = vcat (map prettyOpenOrderObject xs)

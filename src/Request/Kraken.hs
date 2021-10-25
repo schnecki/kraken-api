@@ -7,6 +7,7 @@ import           Request.Kraken.Class                    as R
 import           Request.Kraken.GetAccountBalancePOST    as R
 import           Request.Kraken.GetAssetInfoGET          as R
 import           Request.Kraken.GetOHLCDataGET           as R
+import           Request.Kraken.GetOpenOrdersPOST        as R
 import           Request.Kraken.GetOrderBookGET          as R
 import           Request.Kraken.GetRecentSpreadsGET      as R
 import           Request.Kraken.GetServerTimeGET         as R
