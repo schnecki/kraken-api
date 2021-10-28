@@ -7,6 +7,7 @@ module Data.Kraken.DateTime
     , dateTimeToPOSIXTime
     , posixTimeToDateTime
     , secondsToDateTime
+    , unixTimeStampToDateTime
     , prettyDateTime
     ) where
 
@@ -59,3 +60,6 @@ posixTimeToDateTime = DateTime . Just . posixSecondsToUTCTime
 
 secondsToDateTime :: Integer -> DateTime
 secondsToDateTime = posixTimeToDateTime . fromIntegral
+
+unixTimeStampToDateTime :: Double -> DateTime
+unixTimeStampToDateTime = posixTimeToDateTime . realToFrac

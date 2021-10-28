@@ -9,15 +9,12 @@ module Data.Kraken.OpenOrderList
 
 import           Control.DeepSeq
 import           Data.Aeson
-import qualified Data.HashMap.Strict                as HM (elems, filterWithKey, keys)
+import qualified Data.HashMap.Strict         as HM (elems, keys, lookup)
 import           Data.Serialize
-import qualified Data.Vector                        as V
 import           GHC.Generics
 import           Text.PrettyPrint
 
-import           Data.Kraken.CandlestickGranularity
 import           Data.Kraken.OpenOrderObject
-import           Data.Kraken.Util
 
 
 data OpenOrderList =
@@ -26,12 +23,14 @@ data OpenOrderList =
     }
   deriving (Read, Show, Eq, Ord, Generic, NFData, Serialize)
 
-
 instance FromJSON OpenOrderList where
   parseJSON =
-    withObject "Data.Kraken.OpenOrderList" $ \o -> do
-      datas <- mapM parseJSON (HM.elems o)
-      return $ OpenOrderList $ zipWith OpenOrderObject (HM.keys o) datas
+    withObject "Data.Kraken.OpenOrderList" $ \open -> do
+      let mOpen = HM.lookup "open" open
+      flip (maybe (return $ OpenOrderList [])) mOpen $
+        withObject "Data.Kraken.OpenOrderList open" $ \o -> do
+          datas <- mapM parseJSON (HM.elems o)
+          return $ OpenOrderList $ zipWith OpenOrderObject (HM.keys o) datas
 
 prettyOpenOrderList :: OpenOrderList -> Doc
 prettyOpenOrderList (OpenOrderList xs) = vcat (map prettyOpenOrderObject xs)

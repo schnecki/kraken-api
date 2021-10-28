@@ -1,25 +1,22 @@
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
-module Data.Kraken.OpenOrder
-    ( OpenOrder (..)
-    , prettyOpenOrder
-    , prettyOpenOrderWith
+module Data.Kraken.Order
+    ( Order (..)
+    , prettyOrder
+    , prettyOrderWith
     ) where
 
 
 import           Control.DeepSeq
-import           Control.Monad                (unless)
 import           Data.Aeson
 import           Data.Kraken.OrderDescription
 import           Data.Kraken.OrderFlags
-import           Data.Kraken.OrderMinimum
 import           Data.Kraken.OrderMisc
 import           Data.Kraken.OrderStatus
 import           Data.Serialize
 import           Data.Serialize.Text          ()
 import qualified Data.Text                    as T
-import qualified Data.Vector                  as V
 import           GHC.Generics
 import           Text.PrettyPrint
 
@@ -27,10 +24,11 @@ import           Data.Kraken.DateTime
 import           Data.Kraken.PriceValue
 import           Data.Kraken.Util
 
-data OpenOrder =
-  OpenOrder
+
+data Order =
+  Order
     { refid      :: Maybe T.Text     -- ^ Referral order transaction ID that created this order
-    , userref    :: T.Text           -- ^ User reference id
+    , userref    :: Maybe T.Text     -- ^ User reference id
     , status     :: OrderStatus      -- ^ Status of order
     , opentm     :: DateTime         -- ^ Unix timestamp of when order was placed
     , starttm    :: DateTime         -- ^ Unix timestamp of order start time (or 0 if not set)
@@ -46,51 +44,53 @@ data OpenOrder =
     , misc       :: [OrderMisc]      -- ^ Comma delimited list of miscellaneous info
     , oflags     :: [OrderFlags]     -- ^ Comma delimited list of order flags
     , trades     :: [T.Text]         -- ^ List of trade IDs related to order (if trades info requested and data available)
+    , reason     :: Maybe T.Text     -- ^ Additional info on status (if any)
     }
   deriving (Read, Show, Eq, Ord, Generic, NFData, ToJSON, Serialize)
 
 
-instance FromJSON OpenOrder where
+instance FromJSON Order where
   parseJSON =
-    withArray "Data.Kraken.OpenOrder" $ \arr -> do
-      unless (V.length arr == 17) $ fail ("Expected an array of length 17, but encountered: " ++ show arr)
-      ref <- parseJSON (arr V.! 0)
-      use <- parseJSON (arr V.! 1)
-      stat<- parseJSON (arr V.! 2)
-      ope <- parseJSON (arr V.! 3)
-      star<- parseJSON (arr V.! 4)
-      exp <- parseJSON (arr V.! 5)
-      des <- parseJSON (arr V.! 6)
-      vol <- parseJSON (arr V.! 7)
-      volE<- parseJSON (arr V.! 8)
-      cos <- parseJSON (arr V.! 9)
-      fee <- parseJSON (arr V.! 10)
-      pri <- parseJSON (arr V.! 11)
-      sto <- parseJSON (arr V.! 12)
-      lim <- parseJSON (arr V.! 13)
-      mis <- mapM parseJSON . (map String . T.splitOn ",") =<< parseJSON (arr V.! 14)
-      ofl <- mapM parseJSON . (map String . T.splitOn ",") =<< parseJSON (arr V.! 15)
-      tra <- mapM parseJSON . (map String . T.splitOn ",") =<< parseJSON (arr V.! 16)
-      return $ OpenOrder ref use stat ope star exp des vol volE cos fee pri sto lim mis ofl tra
+    withObject "Data.Kraken.Order" $ \o -> do
+      ref <- o .: "refid"
+      use <- o .: "userref"
+      stat <- o .: "status"
+      ope <- unixTimeStampToDateTime <$> o .: "opentm"
+      star <- unixTimeStampToDateTime <$> o .: "starttm"
+      exp <- unixTimeStampToDateTime <$> o .: "expiretm"
+      des <- o .: "descr"
+      vol <- parseStrToDouble =<< o .: "vol"
+      volE <- parseStrToDouble =<< o .: "vol_exec"
+      cos <- o .: "cost"
+      fee <- o .: "fee"
+      pri <- o .: "price"
+      sto <- o .: "stopprice"
+      lim <- o .: "limitprice"
+      mis <- mapM parseJSON . (map String . filter (not . T.null) . T.splitOn ",") =<< o .: "misc"
+      ofl <- mapM parseJSON . (map String . filter (not . T.null) . T.splitOn ",") =<< o .: "oflags"
+      tra <- maybe (return []) parseList =<< o .:? "trades"
+      rea <- o .: "reason"
+      return $ Order ref use stat ope star exp des vol volE cos fee pri sto lim mis ofl tra rea
+    where parseList = mapM parseJSON . (map String . filter (not . T.null) . T.splitOn ",")
 
 
-prettyOpenOrder :: OpenOrder -> Doc
-prettyOpenOrder = prettyOpenOrderWith 0
+prettyOrder :: Order -> Doc
+prettyOrder = prettyOrderWith 0
 
-prettyOpenOrderWith :: Int -> OpenOrder -> Doc
-prettyOpenOrderWith nesting ord =
-  mVal (refid ord) (\v -> colName "refid"      $$ nest n2 (prettyText $ v)) $+$
-  colName "userref"    $$ nest n2 (prettyText $ userref ord) $+$
+prettyOrderWith :: Int -> Order -> Doc
+prettyOrderWith nesting ord =
+  mVal (refid ord) (\v -> colName "refid"      $$ nest n2 (prettyText v)) $+$
+  mVal (userref ord) (\v -> colName "userref"    $$ nest n2 (prettyText v)) $+$
   colName "status"     $$ nest n2 (prettyOrderStatus $ status ord) $+$
   colName "opentm"     $$ nest n2 (prettyDateTime $ opentm ord) $+$
   colName "starttm"    $$ nest n2 (prettyDateTime $ starttm ord) $+$
   colName "expiretm"   $$ nest n2 (prettyDateTime $ expiretm ord) $+$
-  colName "descr"      $$ nest n2 (prettyOrderDescription $ descr ord) $+$
+  colName "descr"      $$ nest nestIndent (prettyOrderDescriptionWith (nesting + nestIndent) $ descr ord) $+$
   colName "vol"        $$ nest n2 (prettyDouble $ vol ord) $+$
   colName "volExec"    $$ nest n2 (prettyDouble $ volExec ord) $+$
   colName "cost"       $$ nest n2 (prettyPriceValue $ cost ord) $+$
   colName "fee"        $$ nest n2 (prettyPriceValue $ fee ord) $+$
-  colName "price"      $$ nest n2 (prettyPriceValue $ Data.Kraken.OpenOrder.price ord) $+$
+  colName "price"      $$ nest n2 (prettyPriceValue $ Data.Kraken.Order.price ord) $+$
   colName "stopprice"  $$ nest n2 (prettyPriceValue $ stopprice ord) $+$
   colName "limitprice" $$ nest n2 (prettyPriceValue $ limitprice ord) $+$
   colName "misc"       $$ nest n2 (hsep $ punctuate (text ", ") $ map prettyOrderMisc $ misc ord) $+$

@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveAnyClass        #-}
 {-# LANGUAGE DeriveGeneric         #-}
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -12,24 +11,24 @@ module Request.Kraken.GetOpenOrdersPOST
   ) where
 
 import           ApiMaker
-import           Control.Applicative       ((<|>))
-import           Control.DeepSeq
 import           Data.Aeson
-import           Data.Maybe                (fromMaybe)
+import           Data.Char                 (toLower)
 import           GHC.Generics
 
 import           Data.Kraken.OpenOrderList
 import           Data.Kraken.RequestResult
-import           Data.Kraken.Types
 import           Request.Kraken.Class
 
 
 newtype GetOpenOrders = GetOpenOrders OpenOrdersConfig
 
 data OpenOrdersConfig = OpenOrdersConfig
-  { trades  :: Maybe Bool      -- ^  Whether or not to include trades related to position in output. Default: false.
-  , userref :: Maybe Int -- ^ Restrict results to given user reference id
-  } deriving (Show, Read, Eq, Ord, Generic, ToJSON)
+  { opOrdCfgTrades  :: Maybe Bool      -- ^  Whether or not to include trades related to position in output. Default: false.
+  , opOrdCfgUserref :: Maybe Int -- ^ Restrict results to given user reference id
+  } deriving (Show, Read, Eq, Ord, Generic)
+
+instance ToJSON OpenOrdersConfig where
+  toJSON = genericToJSON defaultOptions {fieldLabelModifier = map toLower . drop 8, omitNothingFields = True}
 
 
 instance Request KrakenConfig GetOpenOrders where

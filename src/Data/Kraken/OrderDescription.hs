@@ -31,7 +31,7 @@ data OrderDescription =
     , orderType :: TradeOrderType -- ^ order type
     , price     :: PriceValue     -- ^ decimal primary price
     , price2    :: PriceValue     -- ^ decimal secondary price
-    , leverage  :: Double         -- ^ decimal amount of leverage
+    , leverage  :: Maybe Double   -- ^ decimal amount of leverage
     , order     :: T.Text         -- ^ order description
     , close     :: T.Text         -- ^ conditional close order description (if conditional close set)
     }
@@ -40,23 +40,23 @@ data OrderDescription =
 
 instance FromJSON OrderDescription where
   parseJSON =
-    withArray "Data.Kraken.OrderDescription" $ \arr -> do
-      unless (V.length arr == 8) $ fail ("Expected an array of length 8, but encountered: " ++ show arr)
-      pa <- parseJSON (arr V.! 0)
-      tT <- parseJSON (arr V.! 1)
-      oT <- parseJSON (arr V.! 2)
-      p1 <- parseJSON (arr V.! 3)
-      p2 <- parseJSON (arr V.! 4)
-      leText <- parseJSON (arr V.! 5) :: Parser T.Text
-      case T.splitOn ":" leText of
+    withObject "Data.Kraken.OrderDescription" $ \o -> do
+      pa <- o .: "pair"
+      tT <- o .: "type"
+      oT <- o .: "ordertype"
+      p1 <- o .: "price"
+      p2 <- o .: "price2"
+      leText <- o .: "leverage"
+      le <- case T.splitOn ":" leText of
         [l1, l2] -> do
           le1 <- parseJSON (String l1) :: Parser Double
           le2 <- parseJSON (String l2) :: Parser Double
-          let le = le1 / le2
-          ord <- parseJSON =<< parseStrToNum (arr V.! 6)
-          cl <- parseJSON (arr V.! 7)
-          return $ OrderDescription pa tT oT p1 p2 le ord cl
+          return (Just $ le1 / le2)
+        _ | leText == "none" -> return Nothing
         _ -> fail $ "Expected a leverage in the form of x:y, but saw " ++ show leText
+      ord <- o .: "order"
+      cl <- o .: "close"
+      return $ OrderDescription pa tT oT p1 p2 le ord cl
 
 
 prettyOrderDescription :: OrderDescription -> Doc
@@ -69,7 +69,7 @@ prettyOrderDescriptionWith nesting desc =
   colName "orderType" $$ nest n2 (prettyTradeOrderType $ orderType desc) $+$
   colName "price"     $$ nest n2 (prettyPriceValue $ price desc) $+$
   colName "price2"    $$ nest n2 (prettyPriceValue $ price2 desc) $+$
-  colName "leverage"  $$ nest n2 (double $ leverage desc) $+$
+  colName "leverage"  $$ nest n2 (maybe (text "none") double $ leverage desc) $+$
   colName "order"     $$ nest n2 (text $ T.unpack $ order desc) $+$
   colName "close"     $$ nest n2 (text $ T.unpack $ close desc)
   where n2 = nestCols - nesting

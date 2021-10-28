@@ -4,6 +4,7 @@
 {-# LANGUAGE TypeFamilies #-}
 module Data.Kraken.Util
     ( parseStrToNum
+    , parseStrToDouble
     , jsonSnakeCase
     , nestCols
     , nestIndent
@@ -26,10 +27,16 @@ import           Prelude           hiding ((<>))
 import           Text.PrettyPrint
 import           Text.Read         (readMaybe)
 
+
 parseStrToNum :: Value -> Parser Value
 parseStrToNum (String v) = maybe (fail $ "Could not convert string to Number. String: " ++ show v) (return . Number) (readMaybe $ T.unpack v)
 parseStrToNum x@Number{} = return x
 parseStrToNum v          = fail $ "Expected string of number or number, but encountered : " ++ show v
+
+
+parseStrToDouble :: Value -> Parser Double
+parseStrToDouble v = parseJSON =<< parseStrToNum v
+
 
 jsonSnakeCase :: Options
 jsonSnakeCase = defaultOptions { constructorTagModifier = snakeCase, fieldLabelModifier = snakeCase }

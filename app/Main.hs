@@ -19,6 +19,7 @@ import           Prelude                            hiding (id)
 import           Data.Kraken.AccountBalanceList
 import           Data.Kraken.AssetInfoList
 import           Data.Kraken.CandlestickGranularity
+import           Data.Kraken.ClosedOrderList
 import           Data.Kraken.DateTime
 import           Data.Kraken.OpenOrderList
 import           Data.Kraken.OrderBookList
@@ -75,5 +76,7 @@ main = do
       liftIO $ print $ prettyTradeBalance trBal
       opOrds <- mkReq $ GetOpenOrders (OpenOrdersConfig Nothing Nothing)
       liftIO $ print $ prettyOpenOrderList opOrds
+      clOrds <- mkReq $ GetClosedOrders (ClosedOrdersConfig Nothing Nothing Nothing Nothing Nothing Nothing)
+      liftIO $ print $ prettyClosedOrderList clOrds
   print res
   finalizeAllLoggers
