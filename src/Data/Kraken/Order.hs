@@ -7,7 +7,7 @@ module Data.Kraken.Order
     , prettyOrderWith
     ) where
 
-
+import           Control.Applicative          ((<|>))
 import           Control.DeepSeq
 import           Data.Aeson
 import           Data.Kraken.OrderDescription
@@ -24,11 +24,13 @@ import           Data.Kraken.DateTime
 import           Data.Kraken.PriceValue
 import           Data.Kraken.Util
 
+import           Debug.Trace
+
 
 data Order =
   Order
     { refid      :: Maybe T.Text     -- ^ Referral order transaction ID that created this order
-    , userref    :: Maybe T.Text     -- ^ User reference id
+    , userref    :: Maybe Integer    -- ^ User reference id
     , status     :: OrderStatus      -- ^ Status of order
     , opentm     :: DateTime         -- ^ Unix timestamp of when order was placed
     , starttm    :: DateTime         -- ^ Unix timestamp of order start time (or 0 if not set)
@@ -52,8 +54,11 @@ data Order =
 instance FromJSON Order where
   parseJSON =
     withObject "Data.Kraken.Order" $ \o -> do
-      ref <- o .: "refid"
-      use <- o .: "userref"
+
+      ref <-
+        trace ("o: " ++ show o)
+        o .: "refid"
+      use <- parseJSON =<< parseStrToNum =<< o .: "userref"
       stat <- o .: "status"
       ope <- unixTimeStampToDateTime <$> o .: "opentm"
       star <- unixTimeStampToDateTime <$> o .: "starttm"
@@ -69,7 +74,7 @@ instance FromJSON Order where
       mis <- mapM parseJSON . (map String . filter (not . T.null) . T.splitOn ",") =<< o .: "misc"
       ofl <- mapM parseJSON . (map String . filter (not . T.null) . T.splitOn ",") =<< o .: "oflags"
       tra <- maybe (return []) parseList =<< o .:? "trades"
-      rea <- o .: "reason"
+      rea <- o .: "reason" <|> return Nothing
       return $ Order ref use stat ope star exp des vol volE cos fee pri sto lim mis ofl tra rea
     where parseList = mapM parseJSON . (map String . filter (not . T.null) . T.splitOn ",")
 
@@ -80,7 +85,7 @@ prettyOrder = prettyOrderWith 0
 prettyOrderWith :: Int -> Order -> Doc
 prettyOrderWith nesting ord =
   mVal (refid ord) (\v -> colName "refid"      $$ nest n2 (prettyText v)) $+$
-  mVal (userref ord) (\v -> colName "userref"    $$ nest n2 (prettyText v)) $+$
+  mVal (userref ord) (\v -> colName "userref"    $$ nest n2 (integer v)) $+$
   colName "status"     $$ nest n2 (prettyOrderStatus $ status ord) $+$
   colName "opentm"     $$ nest n2 (prettyDateTime $ opentm ord) $+$
   colName "starttm"    $$ nest n2 (prettyDateTime $ starttm ord) $+$
