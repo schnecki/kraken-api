@@ -24,6 +24,7 @@ import           Data.Kraken.DateTime
 import           Data.Kraken.PriceValue
 import           Data.Kraken.Util
 
+import           Debug.Trace
 
 data Order =
   Order
@@ -52,8 +53,8 @@ data Order =
 instance FromJSON Order where
   parseJSON =
     withObject "Data.Kraken.Order" $ \o -> do
-      ref <- o .: "refid"
-      use <- o .: "userref"
+      ref <- o .: "refid" >>= parseNumToMaybeText
+      use <- o .: "userref" >>= parseNumToMaybeText
       stat <- o .: "status"
       ope <- unixTimeStampToDateTime <$> o .: "opentm"
       star <- unixTimeStampToDateTime <$> o .: "starttm"

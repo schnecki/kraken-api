@@ -5,6 +5,9 @@
 module Data.Kraken.Util
     ( parseStrToNum
     , parseStrToDouble
+    , parseNumToStr
+    , parseNumToText
+    , parseNumToMaybeText
     , jsonSnakeCase
     , nestCols
     , nestIndent
@@ -36,6 +39,19 @@ parseStrToNum v          = fail $ "Expected string of number or number, but enco
 
 parseStrToDouble :: Value -> Parser Double
 parseStrToDouble v = parseJSON =<< parseStrToNum v
+
+
+parseNumToStr :: Value -> Parser Value
+parseNumToStr x@String{} = return x
+parseNumToStr (Number x) = return $ String $ tshow x
+parseNumToStr v          = fail $ "Expected a string or number, but encountered: " ++ show v
+
+parseNumToText :: Value -> Parser T.Text
+parseNumToText v = parseJSON =<< parseNumToStr v
+
+parseNumToMaybeText :: Value -> Parser (Maybe T.Text)
+parseNumToMaybeText Null = return Nothing
+parseNumToMaybeText v    = parseNumToStr v >>= parseJSON >>= maybe (return Nothing) (fmap Just . parseNumToText)
 
 
 jsonSnakeCase :: Options

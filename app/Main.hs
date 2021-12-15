@@ -72,11 +72,13 @@ main = do
       -- liftIO $ print $ prettySpreadList $ SpreadList l' (map (\x -> x { spreads = take 2 (spreads x) ++ lastX 3 (spreads x)}) res)
       -- accBalLs <- mkReq GetAccountBalance
       -- liftIO $ print $ prettyAccountBalanceList accBalLs
-      trBal <- mkReq $ GetTradeBalance (Just "ZUSD")
-      liftIO $ print $ prettyTradeBalance trBal
+      -- trBal <- mkReq $ GetTradeBalance (Just "ZUSD")
+      -- liftIO $ print $ prettyTradeBalance trBal
       opOrds <- mkReq $ GetOpenOrders (OpenOrdersConfig Nothing Nothing)
       liftIO $ print $ prettyOpenOrderList opOrds
       clOrds <- mkReq $ GetClosedOrders (ClosedOrdersConfig Nothing Nothing Nothing Nothing Nothing Nothing)
-      liftIO $ print $ prettyClosedOrderList clOrds
+      liftIO $ print $ prettyClosedOrderList $ ClosedOrderList (take 2 $ closedOrders clOrds)
+      -- clOrds <- mkReq $ GetClosedOrders (ClosedOrdersConfig Nothing Nothing Nothing Nothing Nothing Nothing)
+      -- liftIO $ print $ prettyClosedOrderList $ ClosedOrderList (take 2 $ closedOrders clOrds)
   print res
   finalizeAllLoggers
