@@ -8,6 +8,7 @@ module Data.Kraken.Order
     ) where
 
 
+import           Control.Applicative          ((<|>))
 import           Control.DeepSeq
 import           Data.Aeson
 import           Data.Kraken.OrderDescription
@@ -40,7 +41,7 @@ data Order =
     , cost       :: PriceValue       -- ^ Total cost (quote currency unless)
     , fee        :: PriceValue       -- ^ Total fee (quote currency)
     , price      :: PriceValue       -- ^ Average price (quote currency)
-    , stopprice  :: PriceValue       -- ^ Stop price (quote currency)
+    , stopprice  :: PriceValue       -- ^ Stop price (quote currency). For trailing stops.
     , limitprice :: PriceValue       -- ^ Triggered limit price (quote currency, when limit based order type triggered)
     , misc       :: [OrderMisc]      -- ^ Comma delimited list of miscellaneous info
     , oflags     :: [OrderFlags]     -- ^ Comma delimited list of order flags
@@ -53,8 +54,8 @@ data Order =
 instance FromJSON Order where
   parseJSON =
     withObject "Data.Kraken.Order" $ \o -> do
-      ref <- o .: "refid" >>= parseNumToMaybeText
-      use <- o .: "userref" >>= parseNumToMaybeText
+      ref <- o .: "refid" >>= parseToMaybeText
+      use <- o .: "userref" >>= parseToMaybeText
       stat <- o .: "status"
       ope <- unixTimeStampToDateTime <$> o .: "opentm"
       star <- unixTimeStampToDateTime <$> o .: "starttm"
@@ -70,7 +71,7 @@ instance FromJSON Order where
       mis <- mapM parseJSON . (map String . filter (not . T.null) . T.splitOn ",") =<< o .: "misc"
       ofl <- mapM parseJSON . (map String . filter (not . T.null) . T.splitOn ",") =<< o .: "oflags"
       tra <- maybe (return []) parseList =<< o .:? "trades"
-      rea <- o .: "reason"
+      rea <- o .: "reason" <|> return Nothing
       return $ Order ref use stat ope star exp des vol volE cos fee pri sto lim mis ofl tra rea
     where parseList = mapM parseJSON . (map String . filter (not . T.null) . T.splitOn ",")
 

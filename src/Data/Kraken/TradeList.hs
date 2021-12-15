@@ -4,6 +4,7 @@
 module Data.Kraken.TradeList
     ( TradeList(..)
     , prettyTradeList
+    , allTrades
     ) where
 
 import           Control.DeepSeq
@@ -14,6 +15,7 @@ import qualified Data.Vector             as V
 import           GHC.Generics
 import           Text.PrettyPrint
 
+import           Data.Kraken.Trade
 import           Data.Kraken.TradeObject
 import           Data.Kraken.Util
 
@@ -23,6 +25,9 @@ data TradeList =
     , tradeList :: [TradeObject]
     }
   deriving (Read, Show, Eq, Ord, Generic, NFData, Serialize)
+
+allTrades :: TradeList -> [Trade]
+allTrades = concatMap trades . tradeList
 
 
 instance FromJSON TradeList where

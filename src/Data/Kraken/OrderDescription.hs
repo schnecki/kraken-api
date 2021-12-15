@@ -49,7 +49,7 @@ instance FromJSON OrderDescription where
       p1 <- o .: "price"
       p2 <- o .: "price2"
       leText <- o .: "leverage"
-      le <- trace ("le: " ++ show leText) $ case T.splitOn ":" leText of
+      le <- case T.splitOn ":" leText of
         [l1, l2] -> do
           le1 <- parseStrToDouble (String l1)
           le2 <- parseStrToDouble (String l2)
