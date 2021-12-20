@@ -23,6 +23,7 @@ import           Data.Kraken.ClosedOrderList
 import           Data.Kraken.DateTime
 import           Data.Kraken.OpenOrderList
 import           Data.Kraken.OrderBookList
+import           Data.Kraken.PositionList
 import           Data.Kraken.ServerTime
 import           Data.Kraken.SpreadList
 import           Data.Kraken.SpreadObject
@@ -73,12 +74,16 @@ main = do
       -- liftIO $ print $ prettySpreadList $ SpreadList l' (map (\x -> x { spreads = take 2 (spreads x) ++ lastX 3 (spreads x)}) res)
       -- accBalLs <- mkReq GetAccountBalance
       -- liftIO $ print $ prettyAccountBalanceList accBalLs
-      trBal <- mkReq $ GetTradeBalance (Just "ZUSD")
-      liftIO $ print $ prettyTradeBalance trBal
-      trInfos <- mkReq $ QueryTradesInfo (QueryTradesInfoConfig "TNFTNS-IHEIE-3NVRNU" (Just True))
-      liftIO $ print $ prettyTradeInfoList trInfos
+      -- trBal <- mkReq $ GetTradeBalance (Just "ZUSD")
+      -- liftIO $ print $ prettyTradeBalance trBal
+      -- trInfos <- mkReq $ QueryTradesInfo (QueryTradesInfoConfig "TNFTNS-IHEIE-3NVRNU" (Just True))
+      -- liftIO $ print $ prettyTradeInfoList trInfos
       -- opOrds <- mkReq $ GetOpenOrders (OpenOrdersConfig Nothing Nothing)
       -- liftIO $ print $ prettyOpenOrderList opOrds
+      positions <- mkReq $ GetOpenPositions (OpenPositionsConfig Nothing True Nothing)
+      liftIO $ print $ prettyPositionList positions
+
+
       -- clOrds <- mkReq $ GetClosedOrders (ClosedOrdersConfig Nothing Nothing Nothing Nothing Nothing Nothing)
       -- liftIO $ print $ prettyClosedOrderList $ ClosedOrderList (take 2 $ closedOrders clOrds)
       -- clOrds <- mkReq $ GetClosedOrders (ClosedOrdersConfig Nothing Nothing Nothing Nothing Nothing Nothing)

@@ -4,6 +4,8 @@
 module Data.Kraken.DateTime
     ( DateTime (..)
     , fromDateTime
+    , dateTimeToNanoSeconds
+    , nanoSecondsToDateTime
     , dateTimeToPOSIXTime
     , posixTimeToDateTime
     , secondsToDateTime
@@ -49,6 +51,12 @@ instance ToJSON DateTime where
   toJSON (DateTime Nothing)     = String "0"
   toJSON (DateTime (Just time)) = String $ formatTimeRFC3339 (utcToZonedTime utc time)
 
+nanosSinceEpoch :: UTCTime -> Integer
+nanosSinceEpoch = floor . (1e9 *) . nominalDiffTimeToSeconds . utcTimeToPOSIXSeconds
+
+dateTimeToNanoSeconds :: DateTime -> Integer
+dateTimeToNanoSeconds (DateTime (Just d)) = nanosSinceEpoch d
+dateTimeToNanoSeconds _                   = 0
 
 dateTimeToPOSIXTime :: DateTime -> POSIXTime
 dateTimeToPOSIXTime (DateTime (Just time)) = utcTimeToPOSIXSeconds time
@@ -57,6 +65,11 @@ dateTimeToPOSIXTime (DateTime Nothing)     = 0
 posixTimeToDateTime :: POSIXTime -> DateTime
 posixTimeToDateTime = DateTime . Just . posixSecondsToUTCTime
 
+nanoSecondsToDateTime :: Integer -> DateTime
+nanoSecondsToDateTime = DateTime . Just . nanoSecToUTCTime
+
+nanoSecToUTCTime :: Integer -> UTCTime
+nanoSecToUTCTime t = posixSecondsToUTCTime $ fromInteger t / 1e9
 
 secondsToDateTime :: Integer -> DateTime
 secondsToDateTime = posixTimeToDateTime . fromIntegral
