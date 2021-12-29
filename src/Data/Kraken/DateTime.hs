@@ -5,6 +5,7 @@ module Data.Kraken.DateTime
     ( DateTime (..)
     , fromDateTime
     , dateTimeToNanoSeconds
+    , dateTimeToSeconds
     , nanoSecondsToDateTime
     , dateTimeToPOSIXTime
     , posixTimeToDateTime
@@ -73,6 +74,11 @@ nanoSecToUTCTime t = posixSecondsToUTCTime $ fromInteger t / 1e9
 
 secondsToDateTime :: Integer -> DateTime
 secondsToDateTime = posixTimeToDateTime . fromIntegral
+
+dateTimeToSeconds :: DateTime -> Integer
+dateTimeToSeconds (DateTime (Just x)) = floor $ nominalDiffTimeToSeconds $ utcTimeToPOSIXSeconds x
+dateTimeToSeconds _                   = 0
+
 
 unixTimeStampToDateTime :: Double -> DateTime
 unixTimeStampToDateTime = posixTimeToDateTime . realToFrac
