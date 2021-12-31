@@ -130,6 +130,7 @@ mkSignAndHeaders cfg r nonce = return (requestHeaders, requestBodyBs)
     requestBodyBs = B.intercalate "&" $ map (\(k, v) -> k <> "=" <> fromMaybe "" v) bodyData
     toBS = E.encodeUtf8 . T.pack
 
+
 -- | Convert @RequestBody@ to key-value pairs.
 bodyToBS :: C.RequestBody -> [(B.ByteString, Maybe B.ByteString)]
 bodyToBS (C.RequestBodyLBS x)       = parseBSList x

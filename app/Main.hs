@@ -40,8 +40,8 @@ import           KrakenApi
 
 main :: IO ()
 main = do
-  $(initLoggerAllPackages) (LogFile "borl-trader.log") LogAll True
-  -- $(initLogger) (LogFile "borl-trader.log") LogDebug
+  $(initLoggerAllPackages) (LogFile "borl-trader.log") True
+  -- $(initLogger) (LogFile "borl-trader.log")
   $(logInfo) ("Starting App" :: T.Text)
   apiKey <- C.filter (/= '\n') <$> B.readFile "API_KEY"
   putStrLn $ "API_KEY: " <> show apiKey
