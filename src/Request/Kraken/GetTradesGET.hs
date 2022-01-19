@@ -23,7 +23,7 @@ data GetTrades =
 
 data TradesConfig = TradesConfig
   { tradesPair  :: PairName                     -- ^ Example: pair=XXBTCZUSD,XETHXXBT
-  , tradesSince :: Maybe Integer                -- ^ Return committed Trades data since given ID. Example: Since=1548111600.
+  , tradesSince :: Maybe Integer                -- ^ Return committed Trades data since given ID. Example: Since=1548111600.  The since value is a UNIX timestamp at nanosecond resolution (a standard UNIX timestamp in seconds with 9 additional digits).
   } deriving (Show, Read, Eq, Ord)
 
 

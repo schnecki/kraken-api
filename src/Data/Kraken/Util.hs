@@ -1,10 +1,15 @@
-{-# LANGUAGE DataKinds    #-}
-{-# LANGUAGE GADTs        #-}
-{-# LANGUAGE PolyKinds    #-}
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE DataKinds         #-}
+{-# LANGUAGE GADTs             #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE PolyKinds         #-}
+{-# LANGUAGE TypeFamilies      #-}
 module Data.Kraken.Util
     ( parseStrToNum
     , parseStrToDouble
+    , parseMaybeStrToDouble
+    , parseToStr
+    , parseToText
+    , parseToMaybeText
     , jsonSnakeCase
     , nestCols
     , nestIndent
@@ -23,6 +28,7 @@ import           Data.Aeson.Casing
 import           Data.Aeson.Types
 import           Data.List         (intersperse)
 import qualified Data.Text         as T
+import           Data.Vector       (toList)
 import           Prelude           hiding ((<>))
 import           Text.PrettyPrint
 import           Text.Read         (readMaybe)
@@ -36,6 +42,25 @@ parseStrToNum v          = fail $ "Expected string of number or number, but enco
 
 parseStrToDouble :: Value -> Parser Double
 parseStrToDouble v = parseJSON =<< parseStrToNum v
+
+parseMaybeStrToDouble :: Maybe Value -> Parser (Maybe Double)
+parseMaybeStrToDouble = maybe (return Nothing) (fmap Just . parseStrToDouble)
+
+
+parseToStr :: Value -> Parser Value
+parseToStr x@String{} = return x
+parseToStr (Number x) = return $ String $ tshow x
+parseToStr (Bool x)   = return $ String $ T.toLower $ tshow x
+parseToStr (Array x)  = return $ String $ T.intercalate "," (map tshow $ toList x)
+parseToStr Null       = return $ String "Null"
+parseToStr v          = fail $ "Expected a string or number, but encountered: " ++ show v
+
+parseToText :: Value -> Parser T.Text
+parseToText v = parseJSON =<< parseToStr v
+
+parseToMaybeText :: Value -> Parser (Maybe T.Text)
+parseToMaybeText Null = return Nothing
+parseToMaybeText v    = parseToStr v >>= parseJSON >>= maybe (return Nothing) (fmap Just . parseToText)
 
 
 jsonSnakeCase :: Options

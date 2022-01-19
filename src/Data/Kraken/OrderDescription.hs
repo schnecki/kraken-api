@@ -24,6 +24,8 @@ import           Text.PrettyPrint
 import           Data.Kraken.PriceValue
 import           Data.Kraken.Util
 
+import           Debug.Trace
+
 data OrderDescription =
   OrderDescription
     { pair      :: T.Text         -- ^ asset pair
@@ -49,8 +51,8 @@ instance FromJSON OrderDescription where
       leText <- o .: "leverage"
       le <- case T.splitOn ":" leText of
         [l1, l2] -> do
-          le1 <- parseJSON (String l1) :: Parser Double
-          le2 <- parseJSON (String l2) :: Parser Double
+          le1 <- parseStrToDouble (String l1)
+          le2 <- parseStrToDouble (String l2)
           return (Just $ le1 / le2)
         _ | leText == "none" -> return Nothing
         _ -> fail $ "Expected a leverage in the form of x:y, but saw " ++ show leText

@@ -23,6 +23,7 @@ import           Data.Kraken.ClosedOrderList
 import           Data.Kraken.DateTime
 import           Data.Kraken.OpenOrderList
 import           Data.Kraken.OrderBookList
+import           Data.Kraken.PositionList
 import           Data.Kraken.ServerTime
 import           Data.Kraken.SpreadList
 import           Data.Kraken.SpreadObject
@@ -32,14 +33,15 @@ import           Data.Kraken.TickDataObject
 import           Data.Kraken.TickerInformationList
 import           Data.Kraken.TradableAssetPairList
 import           Data.Kraken.TradeBalance
+import           Data.Kraken.TradeInfoList
 import           Data.Kraken.TradeList
 import           Data.Kraken.TradeObject
 import           KrakenApi
 
 main :: IO ()
 main = do
-  $(initLoggerAllPackages) (LogFile "borl-trader.log") LogAll True
-  -- $(initLogger) (LogFile "borl-trader.log") LogDebug
+  $(initLoggerAllPackages) (LogFile "borl-trader.log") True
+  -- $(initLogger) (LogFile "borl-trader.log")
   $(logInfo) ("Starting App" :: T.Text)
   apiKey <- C.filter (/= '\n') <$> B.readFile "API_KEY"
   putStrLn $ "API_KEY: " <> show apiKey
@@ -78,5 +80,15 @@ main = do
       liftIO $ print $ prettyOpenOrderList opOrds
       clOrds <- mkReq $ GetClosedOrders (ClosedOrdersConfig Nothing Nothing Nothing Nothing Nothing Nothing)
       liftIO $ print $ prettyClosedOrderList clOrds
+      -- trInfos <- mkReq $ QueryTradesInfo (QueryTradesInfoConfig "TNFTNS-IHEIE-3NVRNU" (Just True))
+      -- liftIO $ print $ prettyTradeInfoList trInfos
+      positions <- mkReq $ GetOpenPositions (OpenPositionsConfig Nothing True Nothing)
+      liftIO $ print $ prettyPositionList positions
+
+
+      -- clOrds <- mkReq $ GetClosedOrders (ClosedOrdersConfig Nothing Nothing Nothing Nothing Nothing Nothing)
+      -- liftIO $ print $ prettyClosedOrderList $ ClosedOrderList (take 2 $ closedOrders clOrds)
+      -- clOrds <- mkReq $ GetClosedOrders (ClosedOrdersConfig Nothing Nothing Nothing Nothing Nothing Nothing)
+      -- liftIO $ print $ prettyClosedOrderList $ ClosedOrderList (take 2 $ closedOrders clOrds)
   print res
   finalizeAllLoggers

@@ -2,6 +2,7 @@
 {-# LANGUAGE DeriveGeneric  #-}
 module Data.Kraken.OrderStatus
     ( OrderStatus (..)
+    , PositionStatus
     , prettyOrderStatus
     ) where
 
@@ -12,6 +13,8 @@ import           GHC.Generics
 import           Text.PrettyPrint
 
 import           Data.Kraken.Util
+
+type PositionStatus = OrderStatus
 
 data OrderStatus
   = Pending  -- ^ order pending book entry

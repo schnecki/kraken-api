@@ -30,5 +30,6 @@ prettyOpenOrderObject = prettyOpenOrderObjectWith 0
 prettyOpenOrderObjectWith :: Int -> OpenOrderObject -> Doc
 prettyOpenOrderObjectWith nesting (OpenOrderObject oId order) =
   colName "Open Order ID"    $$ nest n2 (text $ T.unpack oId)  $+$
-                                nest n2 (prettyOrder order)
+                                nest nestIndent' (prettyOrderWith (nesting + nestIndent') order)
   where n2 = nestCols - nesting
+        nestIndent' = nestIndent + nesting

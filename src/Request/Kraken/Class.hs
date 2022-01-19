@@ -58,6 +58,7 @@ import qualified Data.ByteString.Base16                     as B16
 import qualified "base64-bytestring" Data.ByteString.Base64 as B64
 import qualified Data.ByteString.Lazy.Char8                 as BL
 import qualified Data.CaseInsensitive                       as CI
+import           Data.Kraken.Util
 import           Data.List                                  (find)
 import           Data.Maybe                                 (maybe)
 import           Data.Proxy
@@ -100,24 +101,7 @@ data KrakenConfig =
 additionalParams :: KrakenConfig -> [Option 'Https]
 additionalParams config = [] -- header "Content-Type" "application/x-www-form-urlencoded; charset=utf-8"]
 
---  | Sign the API call with the given API-Key, add nonce and OTP if given.
--- withApiSignNonce :: KrakenConfig -> Option 'Https -> IO (Option 'Https)
--- withApiSignNonce cfg ops = (<> ops') <$> mkNonceHeader
---   where ops' = ops <> mkApiKey cfg <> mkOtp cfg
-
--- mkApiKey :: KrakenConfig -> Option 'Https
--- mkApiKey cfg = header "API-Key" (apiKey cfg)
-
--- mkOtp :: KrakenConfig -> Option 'Https
--- mkOtp cfg = maybe mempty (header "otp") (mOtp cfg)
-
--- mkNonceHeader :: IO (Option 'Https)
--- mkNonceHeader = do
---   time <- unixTimestamp
---   let headerOp = header "nonce" . E.encodeUtf8 . T.pack $ time
---   return $ "nonce"  =: time <> headerOp
---   where unixTimestamp = show . round . (* 1000) <$> getPOSIXTime
-
+-- | Nounce is POSIX Timestamp
 mkNonce :: IO Integer
 mkNonce = round . (* 1000) <$> getPOSIXTime
 
@@ -146,6 +130,7 @@ mkSignAndHeaders cfg r nonce = return (requestHeaders, requestBodyBs)
     requestBodyBs = B.intercalate "&" $ map (\(k, v) -> k <> "=" <> fromMaybe "" v) bodyData
     toBS = E.encodeUtf8 . T.pack
 
+
 -- | Convert @RequestBody@ to key-value pairs.
 bodyToBS :: C.RequestBody -> [(B.ByteString, Maybe B.ByteString)]
 bodyToBS (C.RequestBodyLBS x)       = parseBSList x
@@ -159,9 +144,9 @@ data Obj =
     }
 
 instance FromJSON Obj where
-  parseJSON = withObject "Data.Kraken.Class.Obj" $ \o -> Obj . zip (map E.encodeUtf8 $ HM.keys o) . map (fmap E.encodeUtf8) <$> mapM parseJSON (HM.elems o)
+  parseJSON = withObject "Data.Kraken.Class.Obj" $ \o -> Obj . zip (map E.encodeUtf8 $ HM.keys o) . map (fmap E.encodeUtf8) <$> mapM (parseToStr >=> parseJSON) (HM.elems o)
 
-
+-- | Parses the arguments ByteString to a list of arguments, in order to generate the API Signature requested by Kraken.
 parseBSList :: BL.ByteString -> [(B.ByteString, Maybe B.ByteString)]
 parseBSList x
   | BL.null x = []
@@ -175,168 +160,6 @@ parseBSList x
 baseUrlTrade :: Url 'Https
 baseUrlTrade = https "api.kraken.com" /: version
 
--- baseUrlPractice :: Url 'Https
--- baseUrlPractice = https "api.kraken.com" /: version
-
--- streamUrlTrade :: Url 'Https
--- streamUrlTrade = https "stream-fxtrade.kraken.com" /: version
-
--- streamUrlPractice :: Url 'Https
--- streamUrlPractice = https "stream-fxpractice.kraken.com" /: version
-
--- TODO: see http://hdiff.luite.com/cgit/kraken-rest-api/commit?id=0.4.0 for streaming
-
--- headerBearer :: KrakenConfig -> Option 'Https
--- headerBearer config =
---   -- header "Authorization" ("Bearer " <> accessToken config)
---   header "API-Key" ("Bearer " <> apiKey config) <>
---   header "API-Key" ("Bearer " <> apiKey config)
-
 headerRFC3339DatetimeFormat :: Option 'Https
 headerRFC3339DatetimeFormat = header "Accept-Datetime-Format" "RFC3339"
 
-
--- byteS :: W.Word8 -> ShowS
--- byteS b
---   | b < 128 = ((asciiLs !! fromIntegral b) <>)
---   | otherwise = ("\\x" <>) . showHex b
-
--- bytesS :: BS.ByteString -> ShowS
--- bytesS b | B.length b == 1 = byteS $ B.head b
---          | otherwise = foldl' ((. byteS) . (.)) id $ B.unpack b
-
--- showByteString :: BS.ByteString -> String
--- showByteString b = bytesS b ""
-
-
--- asciiLs :: [String]
--- asciiLs =
---   [ "\\x00"
---   , "\\x01"
---   , "\\x02"
---   , "\\x03"
---   , "\\x04"
---   , "\\x05"
---   , "\\x06"
---   , "\\x07"
---   , "\\x08"
---   , "\\t"
---   , "\\n"
---   , "\\x0b"
---   , "\\x0c"
---   , "\\r"
---   , "\\x0e"
---   , "\\x0f"
---   , "\\x10"
---   , "\\x11"
---   , "\\x12"
---   , "\\x13"
---   , "\\x14"
---   , "\\x15"
---   , "\\x16"
---   , "\\x17"
---   , "\\x18"
---   , "\\x19"
---   , "\\x1a"
---   , "\\x1b"
---   , "\\x1c"
---   , "\\x1d"
---   , "\\x1e"
---   , "\\x1f"
---   , " "
---   , "!"
---   , "\""
---   , "#"
---   , "$"
---   , "%"
---   , "&"
---   , "'"
---   , "("
---   , ")"
---   , "*"
---   , "+"
---   , ","
---   , "-"
---   , "."
---   , "/"
---   , "0"
---   , "1"
---   , "2"
---   , "3"
---   , "4"
---   , "5"
---   , "6"
---   , "7"
---   , "8"
---   , "9"
---   , ":"
---   , ";"
---   , "<"
---   , "="
---   , ">"
---   , "?"
---   , "@"
---   , "A"
---   , "B"
---   , "C"
---   , "D"
---   , "E"
---   , "F"
---   , "G"
---   , "H"
---   , "I"
---   , "J"
---   , "K"
---   , "L"
---   , "M"
---   , "N"
---   , "O"
---   , "P"
---   , "Q"
---   , "R"
---   , "S"
---   , "T"
---   , "U"
---   , "V"
---   , "W"
---   , "X"
---   , "Y"
---   , "Z"
---   , "["
---   , "\\"
---   , "]"
---   , "^"
---   , "_"
---   , "`"
---   , "a"
---   , "b"
---   , "c"
---   , "d"
---   , "e"
---   , "f"
---   , "g"
---   , "h"
---   , "i"
---   , "j"
---   , "k"
---   , "l"
---   , "m"
---   , "n"
---   , "o"
---   , "p"
---   , "q"
---   , "r"
---   , "s"
---   , "t"
---   , "u"
---   , "v"
---   , "w"
---   , "x"
---   , "y"
---   , "z"
---   , "{"
---   , "|"
---   , "}"
---   , "~"
---   , "\\x7f"
---   ]

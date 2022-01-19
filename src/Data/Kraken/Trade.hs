@@ -19,9 +19,9 @@ import           GHC.Generics
 import           Text.PrettyPrint
 
 import           Data.Kraken.DateTime
+import           Data.Kraken.OrderType
 import           Data.Kraken.PriceValue
 import           Data.Kraken.TradeOrderType
-import           Data.Kraken.TradeType
 import           Data.Kraken.Util
 
 data Trade =
@@ -29,7 +29,7 @@ data Trade =
     { price          :: PriceValue
     , volume         :: Double
     , time           :: DateTime
-    , tradeType      :: TradeType
+    , tradeType      :: OrderType
     , tradeOrderType :: TradeOrderType
     , miscellaneous  :: T.Text
     }
@@ -57,7 +57,7 @@ prettyTradeWith nesting trade =
   colName "price"          $$ nest n2 (prettyPriceValue $ price trade) $+$
   colName "volume"         $$ nest n2 (double $ volume trade) $+$
   colName "time"           $$ nest n2 (prettyDateTime $ time trade) $+$
-  colName "tradeType"      $$ nest n2 (prettyTradeType $ tradeType trade) $+$
+  colName "tradeType"      $$ nest n2 (prettyOrderType $ tradeType trade) $+$
   colName "tradeOrderType" $$ nest n2 (prettyTradeOrderType $ tradeOrderType trade) $+$
   colName "miscellaneous"  $$ nest n2 (text $ T.unpack $ miscellaneous trade)
   where n1 = 2 * nestIndent

@@ -26,7 +26,6 @@ import           Data.Kraken.Util
 
 import           Debug.Trace
 
-
 data Order =
   Order
     { refid      :: Maybe T.Text     -- ^ Referral order transaction ID that created this order
@@ -41,7 +40,7 @@ data Order =
     , cost       :: PriceValue       -- ^ Total cost (quote currency unless)
     , fee        :: PriceValue       -- ^ Total fee (quote currency)
     , price      :: PriceValue       -- ^ Average price (quote currency)
-    , stopprice  :: PriceValue       -- ^ Stop price (quote currency)
+    , stopprice  :: PriceValue       -- ^ Stop price (quote currency). For trailing stops.
     , limitprice :: PriceValue       -- ^ Triggered limit price (quote currency, when limit based order type triggered)
     , misc       :: [OrderMisc]      -- ^ Comma delimited list of miscellaneous info
     , oflags     :: [OrderFlags]     -- ^ Comma delimited list of order flags
@@ -54,10 +53,8 @@ data Order =
 instance FromJSON Order where
   parseJSON =
     withObject "Data.Kraken.Order" $ \o -> do
-
-      ref <-
-        trace ("o: " ++ show o)
-        o .: "refid"
+      ref <- o .: "refid" >>= parseToMaybeText
+      -- use <- o .: "userref" >>= parseToMaybeText
       use <- parseJSON =<< parseStrToNum =<< o .: "userref"
       stat <- o .: "status"
       ope <- unixTimeStampToDateTime <$> o .: "opentm"
