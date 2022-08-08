@@ -39,6 +39,7 @@ instance FromJSON TradeOrderType where
         "limit"             -> return Limit
         "l"                 -> return Limit
         "stop-loss"         -> return StopLoss
+        "stop market"       -> return StopLoss
         "take-profit"       -> return TakeProfit
         "stop-loss-limit"   -> return StopLossLimit
         "take-profit-limit" -> return TakeProfitLimit

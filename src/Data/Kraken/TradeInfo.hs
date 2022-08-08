@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 module Data.Kraken.TradeInfo
     ( TradeInfo (..)
     , prettyTradeInfo
@@ -15,6 +16,7 @@ import           Data.Aeson
 import           Data.Serialize
 import           Data.Serialize.Text        ()
 import qualified Data.Text                  as T
+import           EasyLogger
 import           GHC.Generics
 import           Text.PrettyPrint
 
@@ -55,7 +57,8 @@ data TradeInfo =
 
 instance FromJSON TradeInfo where
   parseJSON =
-    withObject "Data.Kraken.TradeInfo" $ \o -> do
+    withObject "Data.Kraken.TradeInfo" $ \o ->
+    $(pureLogDebug) ("Data.Kraken.TradeInfo parseJSON input: " ++ show o) $ do
       tx <- o .: "ordertxid"
       pa <- o .: "pair"
       ti <- unixTimeStampToDateTime <$> o .: "time"

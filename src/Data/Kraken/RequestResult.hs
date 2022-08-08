@@ -32,7 +32,7 @@ data RequestResult a = RequestResult
 
 fromRequestResult :: (MonadError SafeException m) => RequestResult a -> m a
 fromRequestResult (RequestResult [] (Just res)) = return res
-fromRequestResult (RequestResult err _)  = throwUserException $ EUnknownError $ T.intercalate ";" $ map tshow err
+fromRequestResult (RequestResult err _)         = throwUserException $ EUnknownError $ T.intercalate ";" $ map tshow err
 
 
 prettyRequestResult :: (a -> Doc) -> RequestResult a -> Doc
@@ -41,4 +41,3 @@ prettyRequestResult pRes (RequestResult err (Just res)) =
   colName "result"     $$ nest nestCols (pRes res)
 prettyRequestResult pRes (RequestResult err Nothing) =
   colName "error"      $$ nest nestCols (text $ show err)
-

@@ -18,4 +18,5 @@ import           Request.Kraken.GetTickerInformationGET  as R
 import           Request.Kraken.GetTradableAssetPairsGET as R
 import           Request.Kraken.GetTradeBalancePOST      as R
 import           Request.Kraken.GetTradesGET             as R
+import           Request.Kraken.GetTradesHistoryPOST     as R
 import           Request.Kraken.QueryTradesInfoPOST      as R

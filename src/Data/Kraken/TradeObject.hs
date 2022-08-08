@@ -29,5 +29,3 @@ prettyTradeObject :: TradeObject -> Doc
 prettyTradeObject (TradeObject n p) =
   colName "Trade Pair" $$ nest nestCols (text $ T.unpack n) $+$
   nest nestIndent (vcat $ map (prettyTradeWith nestIndent) p)
-
-

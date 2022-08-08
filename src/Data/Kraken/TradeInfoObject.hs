@@ -5,7 +5,6 @@ module Data.Kraken.TradeInfoObject
     , prettyTradeInfoObject
     ) where
 
-
 import           Control.DeepSeq
 import           Data.Serialize
 import qualified Data.Text             as T

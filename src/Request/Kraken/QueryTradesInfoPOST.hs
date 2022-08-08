@@ -43,4 +43,3 @@ instance Request KrakenConfig QueryTradesInfo where
   requestModifier = addNonceAndApiSign
   option _ QueryTradesInfo{} = return headerRFC3339DatetimeFormat
   process _ _ resp = fromRequestResult (responseBody resp)
-

@@ -48,6 +48,7 @@ import           Data.List                                  (foldl')
 import           Data.Maybe                                 (fromMaybe)
 import           Data.Text.Internal.Unsafe.Char
 import qualified Data.Word                                  as W
+import           EasyLogger
 import           GHC.Exts
 import           GHC.Show                                   (showLitChar)
 import           Numeric                                    (showHex)
@@ -101,16 +102,20 @@ data KrakenConfig =
 additionalParams :: KrakenConfig -> [Option 'Https]
 additionalParams config = [] -- header "Content-Type" "application/x-www-form-urlencoded; charset=utf-8"]
 
--- | Nounce is POSIX Timestamp
-mkNonce :: IO Integer
-mkNonce = round . (* 1000) <$> getPOSIXTime
-
 
 -- | Creates the required bodies and headers for sending requests to the private API.
 addNonceAndApiSign :: KrakenConfig -> r -> C.Request -> IO C.Request
-addNonceAndApiSign cfg _ r = mkNonce >>= mkSignAndHeaders cfg r . E.encodeUtf8 . T.pack . show >>= setBodyAndHeader
+addNonceAndApiSign cfg _ r = do
+  nonce <- mkNonce
+  res@(headers, body) <- mkSignAndHeaders cfg r . E.encodeUtf8 . T.pack $ show nonce
+  $(logPrintDebugText) $ "Nonce: " <> T.pack (show nonce)
+  $(logPrintDebugText) $ "Headers: " <> T.pack (show headers)
+  $(logPrintDebugText) $ "Body: " <> T.pack (show body)
+  setBodyAndHeader res
   where
     setBodyAndHeader (headers, bodies) = return $ r {C.requestHeaders = headers, C.requestBody = C.RequestBodyBS bodies}
+    mkNonce :: IO Integer
+    mkNonce = round . (* 1000) <$> getPOSIXTime
 
 
 -- | Make Nonce and Hash for API Sign. Returns the header and body to be set (including the already set values).
@@ -162,4 +167,3 @@ baseUrlTrade = https "api.kraken.com" /: version
 
 headerRFC3339DatetimeFormat :: Option 'Https
 headerRFC3339DatetimeFormat = header "Accept-Datetime-Format" "RFC3339"
-

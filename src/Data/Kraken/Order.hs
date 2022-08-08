@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 module Data.Kraken.Order
     ( Order (..)
     , prettyOrder
@@ -17,6 +18,7 @@ import           Data.Kraken.OrderStatus
 import           Data.Serialize
 import           Data.Serialize.Text          ()
 import qualified Data.Text                    as T
+import           EasyLogger
 import           GHC.Generics
 import           Text.PrettyPrint
 
@@ -29,7 +31,7 @@ import           Debug.Trace
 data Order =
   Order
     { refid      :: Maybe T.Text     -- ^ Referral order transaction ID that created this order
-    , userref    :: Maybe Integer    -- ^ User reference id
+    , userref    :: Maybe T.Text     -- ^ User reference id
     , status     :: OrderStatus      -- ^ Status of order
     , opentm     :: DateTime         -- ^ Unix timestamp of when order was placed
     , starttm    :: DateTime         -- ^ Unix timestamp of order start time (or 0 if not set)
@@ -52,10 +54,11 @@ data Order =
 
 instance FromJSON Order where
   parseJSON =
-    withObject "Data.Kraken.Order" $ \o -> do
+    withObject "Data.Kraken.Order" $ \o ->
+    $(pureLogDebug) ("Data.Kraken.Order parseJSON input: " ++ show o) $ do
       ref <- o .: "refid" >>= parseToMaybeText
-      -- use <- o .: "userref" >>= parseToMaybeText
-      use <- parseJSON =<< parseStrToNum =<< o .: "userref"
+      use <- o .: "userref" >>= parseToMaybeText
+      -- use <- parseJSON =<< parseStrToNum =<< o .: "userref"
       stat <- o .: "status"
       ope <- unixTimeStampToDateTime <$> o .: "opentm"
       star <- unixTimeStampToDateTime <$> o .: "starttm"
@@ -82,7 +85,7 @@ prettyOrder = prettyOrderWith 0
 prettyOrderWith :: Int -> Order -> Doc
 prettyOrderWith nesting ord =
   mVal (refid ord) (\v -> colName "refid"      $$ nest n2 (prettyText v)) $+$
-  mVal (userref ord) (\v -> colName "userref"    $$ nest n2 (integer v)) $+$
+  mVal (userref ord) (\v -> colName "userref"    $$ nest n2 (prettyText v)) $+$
   colName "status"     $$ nest n2 (prettyOrderStatus $ status ord) $+$
   colName "opentm"     $$ nest n2 (prettyDateTime $ opentm ord) $+$
   colName "starttm"    $$ nest n2 (prettyDateTime $ starttm ord) $+$

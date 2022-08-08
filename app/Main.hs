@@ -33,6 +33,7 @@ import           Data.Kraken.TickDataObject
 import           Data.Kraken.TickerInformationList
 import           Data.Kraken.TradableAssetPairList
 import           Data.Kraken.TradeBalance
+import           Data.Kraken.TradeHistoryList
 import           Data.Kraken.TradeInfoList
 import           Data.Kraken.TradeList
 import           Data.Kraken.TradeObject
@@ -40,9 +41,14 @@ import           KrakenApi
 
 main :: IO ()
 main = do
-  $(initLoggerAllPackages) (LogFile "borl-trader.log") True
-  -- $(initLogger) (LogFile "borl-trader.log")
+  $(initLoggerAllPackages) (LogFile "kraken-api.log") True
+  enableKrakenApiLogging (LogFile "kraken-api.log")
+  enableRequestLogging (LogFile "kraken-api.log")
+  setMinLogLevel LogDebug -- Levels: LogNone < LogAll < LogDebug < LogInfo < LogWarning < LogError
+  setPrintLocationToConsole True
   $(logInfo) ("Starting App" :: T.Text)
+
+  -- Starting
   apiKey <- C.filter (/= '\n') <$> B.readFile "API_KEY"
   putStrLn $ "API_KEY: " <> show apiKey
   prApiKey <- C.filter (/= '\n') <$> B.readFile "API_KEY_PRIVATE"
@@ -60,7 +66,7 @@ main = do
       -- liftIO $ print $ prettyAssetInfoList res
       -- res <- mkReq $ GetTradableAssetPairs (TradableAssetPairsConfig "ADAEUR" (Just Info))
       -- liftIO $ print $ prettyTradableAssetPairList res
-      -- liftIO $ enableRequestLogging (LogFile "borl-trader.log") LogDebug
+
       -- res <- mkReq $ GetTickerInformation "ADAEUR"
       -- liftIO $ print $ prettyTickerInformationList res
       -- res@(TickDataList gr l dats) <- mkReq $ GetOHLCData (OHLCDataConfig "ADAEUR" (Just H4) (Just 1633515697))
@@ -72,18 +78,24 @@ main = do
       -- liftIO $ print $ prettyTradeList $ TradeList l' (map (\x -> x { Data.Kraken.TradeObject.trades = take 2 (Data.Kraken.TradeObject.trades x) ++ lastX 3 (Data.Kraken.TradeObject.trades x)}) res)
       -- SpreadList l' res <- mkReq $ GetRecentSpreads (RecentSpreadsConfig "ADAEUR" Nothing)
       -- liftIO $ print $ prettySpreadList $ SpreadList l' (map (\x -> x { spreads = take 2 (spreads x) ++ lastX 3 (spreads x)}) res)
+
+
       -- accBalLs <- mkReq GetAccountBalance
       -- liftIO $ print $ prettyAccountBalanceList accBalLs
       -- trBal <- mkReq $ GetTradeBalance (Just "ZUSD")
       -- liftIO $ print $ prettyTradeBalance trBal
-      opOrds <- mkReq $ GetOpenOrders (OpenOrdersConfig Nothing Nothing)
-      liftIO $ print $ prettyOpenOrderList opOrds
-      clOrds <- mkReq $ GetClosedOrders (ClosedOrdersConfig Nothing Nothing Nothing Nothing Nothing Nothing)
-      liftIO $ print $ prettyClosedOrderList clOrds
-      -- trInfos <- mkReq $ QueryTradesInfo (QueryTradesInfoConfig "TNFTNS-IHEIE-3NVRNU" (Just True))
-      -- liftIO $ print $ prettyTradeInfoList trInfos
-      positions <- mkReq $ GetOpenPositions (OpenPositionsConfig Nothing True Nothing)
-      liftIO $ print $ prettyPositionList positions
+      -- opOrds <- mkReq $ GetOpenOrders (OpenOrdersConfig Nothing Nothing)
+      -- liftIO $ print $ prettyOpenOrderList opOrds
+      -- clOrds <- mkReq $ GetClosedOrders (ClosedOrdersConfig Nothing Nothing Nothing Nothing Nothing Nothing)
+      -- liftIO $ print $ prettyClosedOrderList clOrds
+      -- -- trInfos <- mkReq $ QueryTradesInfo (QueryTradesInfoConfig "TNFTNS-IHEIE-3NVRNU" (Just True))
+      -- -- liftIO $ print $ prettyTradeInfoList trInfos
+      -- positions <- mkReq $ GetOpenPositions (OpenPositionsConfig Nothing True Nothing)
+      -- liftIO $ print $ prettyPositionList positions
+
+
+      res <- mkReq $ GetTradesHistory (TradesHistoryConfig Nothing (Just True) Nothing Nothing Nothing)
+      liftIO $ print $ prettyTradeHistoryList res --   $ TradeList l' (map (\x -> x { Data.Kraken.TradeObject.trades = take 2 (Data.Kraken.TradeObject.trades x) ++ lastX 3 (Data.Kraken.TradeObject.trades x)}) res)
 
 
       -- clOrds <- mkReq $ GetClosedOrders (ClosedOrdersConfig Nothing Nothing Nothing Nothing Nothing Nothing)

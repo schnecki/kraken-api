@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE DeriveGeneric     #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 module Data.Kraken.ClosedOrderList
     ( ClosedOrderList (..)
     , prettyClosedOrderList
@@ -12,6 +13,7 @@ import           Data.Aeson
 import qualified Data.HashMap.Strict                as HM (elems, filterWithKey, keys, lookup)
 import           Data.Serialize
 import qualified Data.Vector                        as V
+import           EasyLogger
 import           GHC.Generics
 import           Text.PrettyPrint
 
@@ -29,7 +31,8 @@ data ClosedOrderList =
 
 instance FromJSON ClosedOrderList where
   parseJSON =
-    withObject "Data.Kraken.ClosedOrderList" $ \closed -> do
+    withObject "Data.Kraken.ClosedOrderList" $ \closed ->
+    $(pureLogDebug) ("Data.Kraken.ClosedOrderList parseJSON input: " ++ show closed) $ do
       let mClosed = HM.lookup "closed" closed
       flip (maybe (return $ ClosedOrderList [])) mClosed $
         withObject "Data.Kraken.ClosedOrderList closed" $ \o -> do
@@ -38,5 +41,3 @@ instance FromJSON ClosedOrderList where
 
 prettyClosedOrderList :: ClosedOrderList -> Doc
 prettyClosedOrderList (ClosedOrderList xs) = vcat (map prettyClosedOrderObject xs)
-
-

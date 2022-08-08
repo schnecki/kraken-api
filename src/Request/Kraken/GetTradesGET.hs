@@ -15,8 +15,7 @@ import           Data.Kraken.TradeList
 import           Data.Kraken.Types
 import           Request.Kraken.Class
 
--- | Fetches up to the last 720 candles. Note: the last entry in the OHLC array is for the current, not-yet-committed frame and will always be present, regardless of the value of since.
---   See also: https://support.kraken.com/hc/en-us/articles/218198197
+-- | Fetches trades.
 data GetTrades =
   GetTrades TradesConfig
 
