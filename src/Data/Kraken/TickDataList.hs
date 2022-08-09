@@ -10,6 +10,7 @@ module Data.Kraken.TickDataList
 
 import           Control.DeepSeq
 import           Data.Aeson
+import           Data.Aeson.KeyMap                  (toHashMapText)
 import qualified Data.HashMap.Strict                as HM (elems, filterWithKey, keys)
 import           Data.Serialize
 import qualified Data.Vector                        as V
@@ -33,9 +34,10 @@ data TickDataList =
 instance FromJSON TickDataList where
   parseJSON =
     withObject "Data.Kraken.TickDataList" $ \o -> do
+      let oHM = toHashMapText o
       last' <- parseJSON =<< parseStrToNum =<< (o .: "last")
-      datas <- mapM (withArray "Data.Kraken.TickDataList parsing TickData" (fmap V.toList . mapM parseJSON)) (mkElems o)
-      return $ TickDataList Nothing last' $ zipWith TickDataObject (mkKeys o) datas
+      datas <- mapM (withArray "Data.Kraken.TickDataList parsing TickData" (fmap V.toList . mapM parseJSON)) (mkElems oHM)
+      return $ TickDataList Nothing last' $ zipWith TickDataObject (mkKeys oHM) datas
     where
       mkKeys o = filter (/= "last") (HM.keys o)
       mkElems o = HM.elems $ HM.filterWithKey (\k _ -> k /= "last") o

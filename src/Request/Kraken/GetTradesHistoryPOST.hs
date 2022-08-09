@@ -6,6 +6,7 @@
 module Request.Kraken.GetTradesHistoryPOST
   ( GetTradesHistory(..)
   , TradesHistoryConfig (..)
+  , HistoryType(..)
   ) where
 
 import           ApiMaker

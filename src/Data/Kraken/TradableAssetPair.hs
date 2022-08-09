@@ -10,7 +10,8 @@ module Data.Kraken.TradableAssetPair
 import           Control.Applicative      ((<|>))
 import           Control.DeepSeq
 import           Data.Aeson
-import qualified Data.HashMap.Strict      as HM
+import           Data.Aeson.Key           (fromString)
+import           Data.Aeson.KeyMap        (insert)
 import           Data.Serialize
 import           Data.Serialize.Text      ()
 import qualified Data.Text                as T
@@ -70,7 +71,7 @@ instance FromJSON TradableAssetPair where
     genericParseJSON jsonSnakeCase (objTag "tradable_asset_pair_leverage") <|>
     genericParseJSON jsonSnakeCase (objTag "tradable_asset_pair_fees") <|>
     genericParseJSON jsonSnakeCase (objTag "tradable_asset_pair_margin")
-    where objTag tag = Object $ HM.insert "tag" (String tag) v
+    where objTag tag = Object $ insert (fromString "tag") (String tag) v
   parseJSON x = fail $ "Unexpected type in FromJSON of Data.Kraken.TradableAssetPair: " ++ show x
 
 

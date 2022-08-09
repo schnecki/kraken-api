@@ -5,11 +5,12 @@
 module Data.Kraken.TradeHistoryList
     ( TradeHistoryList(..)
     , prettyTradeHistoryList
-    , allTradeHistories
+    , allTradeInfos
     ) where
 
 import           Control.DeepSeq
 import           Data.Aeson
+import           Data.Aeson.KeyMap           (toHashMapText)
 import qualified Data.HashMap.Strict         as HM (elems, filterWithKey, keys)
 import           Data.Serialize
 import           EasyLogger
@@ -27,8 +28,8 @@ data TradeHistoryList =
     }
   deriving (Read, Show, Eq, Ord, Generic, NFData, Serialize)
 
-allTradeHistories :: TradeHistoryList -> [TradeInfo]
-allTradeHistories = map tradeInfos . tradeHistoryList
+allTradeInfos :: TradeHistoryList -> [TradeInfo]
+allTradeInfos = map tradeInfo . tradeHistoryList
 
 
 instance FromJSON TradeHistoryList where
@@ -40,8 +41,9 @@ instance FromJSON TradeHistoryList where
         return $  TradeHistoryList trades count
     where
       parseTradeInfoObjects o = do
-          datas <- mapM parseJSON (HM.elems o)
-          return $ zipWith TradeInfoObject (HM.keys o) datas
+          let oHM = toHashMapText o
+          datas <- mapM parseJSON (HM.elems oHM)
+          return $ zipWith TradeInfoObject (HM.keys oHM) datas
 
 
 prettyTradeHistoryList :: TradeHistoryList -> Doc

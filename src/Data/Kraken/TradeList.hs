@@ -9,6 +9,7 @@ module Data.Kraken.TradeList
 
 import           Control.DeepSeq
 import           Data.Aeson
+import           Data.Aeson.KeyMap       (toHashMapText)
 import qualified Data.HashMap.Strict     as HM (elems, filterWithKey, keys)
 import           Data.Serialize
 import qualified Data.Vector             as V
@@ -34,8 +35,9 @@ instance FromJSON TradeList where
   parseJSON =
     withObject "Data.Kraken.TradeList" $ \o -> do
       last' <- parseJSON =<< parseStrToNum =<< (o .: "last")
-      datas <- mapM (withArray "Data.Kraken.TradeList parsing Trades" $ \o' -> V.toList <$> mapM parseJSON o') (mkElems o)
-      return $ TradeList last' $ zipWith TradeObject (mkKeys o) datas
+      let oHM = toHashMapText o
+      datas <- mapM (withArray "Data.Kraken.TradeList parsing Trades" $ \o' -> V.toList <$> mapM parseJSON o') (mkElems oHM)
+      return $ TradeList last' $ zipWith TradeObject (mkKeys oHM) datas
     where
       mkKeys o = filter (/= "last") (HM.keys o)
       mkElems o = HM.elems $ HM.filterWithKey (\k _ -> k /= "last") o

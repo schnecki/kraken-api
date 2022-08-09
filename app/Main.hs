@@ -10,6 +10,7 @@ import           Control.Monad.Trans.State
 import           Data.Aeson                         (encode)
 import qualified Data.ByteString                    as B
 import qualified Data.ByteString.Char8              as C
+import           Data.Maybe                         (isJust)
 import qualified Data.Text                          as T
 import           Data.Time.Clock
 import qualified Data.Word                          as W8
@@ -22,7 +23,9 @@ import           Data.Kraken.CandlestickGranularity
 import           Data.Kraken.ClosedOrderList
 import           Data.Kraken.DateTime
 import           Data.Kraken.OpenOrderList
+import           Data.Kraken.OrderAdded
 import           Data.Kraken.OrderBookList
+import           Data.Kraken.OrderType
 import           Data.Kraken.PositionList
 import           Data.Kraken.ServerTime
 import           Data.Kraken.SpreadList
@@ -34,7 +37,9 @@ import           Data.Kraken.TickerInformationList
 import           Data.Kraken.TradableAssetPairList
 import           Data.Kraken.TradeBalance
 import           Data.Kraken.TradeHistoryList
+import           Data.Kraken.TradeInfo
 import           Data.Kraken.TradeInfoList
+import           Data.Kraken.TradeInfoObject
 import           Data.Kraken.TradeList
 import           Data.Kraken.TradeObject
 import           KrakenApi
@@ -90,13 +95,17 @@ main = do
       -- liftIO $ print $ prettyClosedOrderList clOrds
       -- -- trInfos <- mkReq $ QueryTradesInfo (QueryTradesInfoConfig "TNFTNS-IHEIE-3NVRNU" (Just True))
       -- -- liftIO $ print $ prettyTradeInfoList trInfos
-      -- positions <- mkReq $ GetOpenPositions (OpenPositionsConfig Nothing True Nothing)
-      -- liftIO $ print $ prettyPositionList positions
+      positions <- mkReq $ GetOpenPositions (OpenPositionsConfig Nothing True Nothing)
+      liftIO $ print $ prettyPositionList positions
 
 
-      res <- mkReq $ GetTradesHistory (TradesHistoryConfig Nothing (Just True) Nothing Nothing Nothing)
-      liftIO $ print $ prettyTradeHistoryList res --   $ TradeList l' (map (\x -> x { Data.Kraken.TradeObject.trades = take 2 (Data.Kraken.TradeObject.trades x) ++ lastX 3 (Data.Kraken.TradeObject.trades x)}) res)
+      TradeHistoryList res _ <- mkReq $ GetTradesHistory (TradesHistoryConfig Nothing (Just False) Nothing Nothing Nothing)
+      let res' = filter (isJust . posstatus . tradeInfo) res
+      liftIO $ print $ prettyTradeHistoryList $ TradeHistoryList res' (length res')
 
+
+      res <- mkReq $ AddOrder $ AddOrderConfig Nothing AddOrderMarket Buy "0.1" "XXBTZUSD" Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing (Just AddOrderStopLoss) (Just "20000") Nothing Nothing (Just True)
+      liftIO $ print $ prettyOrderAdded res
 
       -- clOrds <- mkReq $ GetClosedOrders (ClosedOrdersConfig Nothing Nothing Nothing Nothing Nothing Nothing)
       -- liftIO $ print $ prettyClosedOrderList $ ClosedOrderList (take 2 $ closedOrders clOrds)

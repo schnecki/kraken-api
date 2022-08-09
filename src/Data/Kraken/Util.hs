@@ -21,11 +21,13 @@ module Data.Kraken.Util
     , hsepComma
     , prettyText
     , prettyDouble
+    , lowerCase
     ) where
 
 import           Data.Aeson
 import           Data.Aeson.Casing
 import           Data.Aeson.Types
+import           Data.Char         (toLower)
 import           Data.List         (intersperse)
 import qualified Data.Text         as T
 import           Data.Vector       (toList)
@@ -65,6 +67,10 @@ parseToMaybeText v    = parseToStr v >>= parseJSON >>= maybe (return Nothing) (f
 
 jsonSnakeCase :: Options
 jsonSnakeCase = defaultOptions { constructorTagModifier = snakeCase, fieldLabelModifier = snakeCase }
+
+
+lowerCase :: Options
+lowerCase = defaultOptions { constructorTagModifier = map toLower, fieldLabelModifier = map toLower }
 
 -- jsonCamelCase :: Options
 -- jsonCamelCase = defaultOptions { constructorTagModifier = snakeCase }

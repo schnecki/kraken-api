@@ -16,8 +16,8 @@ import           Data.Kraken.Util
 
 
 data TradeInfoObject = TradeInfoObject
-  { tradeId    :: T.Text
-  , tradeInfos :: TradeInfo
+  { tradeId   :: T.Text
+  , tradeInfo :: TradeInfo
   }
   deriving (Read, Show, Eq, Ord, Generic, NFData, Serialize)
 

@@ -24,10 +24,9 @@ import           Data.Kraken.DateTime
 import           Data.Kraken.OrderType
 import           Data.Kraken.PriceValue
 import           Data.Kraken.TradeOrderType
+import           Data.Kraken.TradeState
 import           Data.Kraken.Types
 import           Data.Kraken.Util
-
-import           Debug.Trace
 
 
 data TradeInfo =
@@ -43,7 +42,7 @@ data TradeInfo =
     ,  vol       :: Double           -- ^ Volume (base currency)
     ,  margin    :: Double           -- ^ Initial margin (quote currency)
     ,  misc      :: [T.Text]         -- ^ Comma delimited list of miscellaneous info: closing — Trade closes all or part of a position
-    ,  posstatus :: Maybe T.Text     -- ^ Position status (open/closed). Only present if trade opened a position
+    ,  posstatus :: Maybe TradeState -- ^ Position status (open/closed). Only present if trade opened a position
     ,  cprice    :: Maybe PriceValue -- ^ Average price of closed portion of position (quote currency). Only present if trade opened a position
     ,  ccost     :: Maybe PriceValue -- ^ Total cost of closed portion of position (quote currency). Only present if trade opened a position
     ,  cfee      :: Maybe PriceValue -- ^ Total fee of closed portion of position (quote currency). Only present if trade opened a position
@@ -70,7 +69,7 @@ instance FromJSON TradeInfo where
       vo <- o .: "vol" >>= parseStrToDouble
       ma <- o .: "margin"  >>= parseStrToDouble
       mis <- T.splitOn "," <$> o .: "misc"
-      poss <- o .: "posstatus" <|> return Nothing
+      poss <- (o .: "posstatus" >>= parseJSON) <|> return Nothing
       cpr <- o .: "cprice" <|> return Nothing
       ccost <- o .: "ccost" <|> return Nothing
       cfee <- o .: "cfee" <|> return Nothing
@@ -99,7 +98,7 @@ prettyTradeInfoWith nesting ord =
   colName "vol"                                   $$ nest n2 (prettyDouble $ vol ord) $+$
   colName "margin"                                $$ nest n2 (prettyDouble $ margin ord) $+$
   colName "misc"                                  $$ nest n2 (hsep $ punctuate (text ", ") $ map prettyText $ misc ord) $+$
-  mVal (posstatus ord) (\v -> colName "posstatus" $$ nest n2 (prettyText v)) $+$
+  mVal (posstatus ord) (\v -> colName "posstatus" $$ nest n2 (prettyTradeState v)) $+$
   mVal (cprice ord) (\v -> colName "cprice"       $$ nest n2 (prettyPriceValue v)) $+$
   mVal (ccost ord) (\v -> colName "ccost"         $$ nest n2 (prettyPriceValue v)) $+$
   mVal (cfee ord) (\v -> colName "cfee"           $$ nest n2 (prettyPriceValue v)) $+$
