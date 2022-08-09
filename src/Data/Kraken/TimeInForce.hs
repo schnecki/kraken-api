@@ -15,5 +15,5 @@ import           GHC.Generics
 data TimeInForce
   = GTC -- ^ The Order is “Good unTil Cancelled”
   | GTD -- ^ The Order is “Good unTil Date” and will be cancelled at the provided time
-  | IOC -- ^ The Order must be “Immediatedly paritally filled Or Cancelled”
+  | IOC -- ^ The Order must be “Immediatedly partially filled Or Cancelled”
   deriving (Bounded, Enum, Show, Read, Eq, Ord, FromJSON, ToJSON, Generic, NFData)
