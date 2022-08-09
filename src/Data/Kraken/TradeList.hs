@@ -66,8 +66,8 @@ checkInstrData xs = checkDataPoint startStats startXs restXs
         newDiffTime = fromIntegral $ abs $ dateTimeToSeconds (time x) - dateTimeToSeconds (time $ last acc)
         newExpPrice = (1 - alpha) * expPrice + alpha * priceValueToDouble (price x)
         newExpDiffTime = (1 - alpha) * expDiffTime + alpha * newDiffTime
-    normalPriceChange expPrice val = val >= 0.1 * expPrice && val <= 10 * expPrice
-    normalTimeStep expTimeDiff newDiffTime = newDiffTime <= 50 * expTimeDiff
+    normalPriceChange expPrice val = val >= 0.2 * expPrice && val <= 5 * expPrice
+    normalTimeStep expTimeDiff newDiffTime = newDiffTime <= 30 * expTimeDiff
     alpha = 0.1
     (startXs, restXs) = splitAt 10 xs
     startStats = (startPrice, startDiffTime)
