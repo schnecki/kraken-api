@@ -10,7 +10,6 @@ module Data.Kraken.ClosedOrderList
 
 import           Control.DeepSeq
 import           Data.Aeson
-import           Data.Aeson.KeyMap                  (toHashMapText)
 import qualified Data.HashMap.Strict                as HM (elems, filterWithKey, keys, lookup)
 import           Data.Serialize
 import qualified Data.Vector                        as V
@@ -34,12 +33,11 @@ instance FromJSON ClosedOrderList where
   parseJSON =
     withObject "Data.Kraken.ClosedOrderList" $ \closed ->
       $(pureLogDebug) ("Data.Kraken.ClosedOrderList parseJSON input: " ++ show closed) $ do
-        let mClosed = HM.lookup "closed" (toHashMapText closed)
+        let mClosed = HM.lookup "closed" closed
         flip (maybe (return $ ClosedOrderList [])) mClosed $
           withObject "Data.Kraken.ClosedOrderList closed" $ \o -> do
-            let oHM = toHashMapText closed
-            datas <- mapM parseJSON (HM.elems oHM)
-            return $ ClosedOrderList $ zipWith ClosedOrderObject (HM.keys oHM) datas
+            datas <- mapM parseJSON (HM.elems o)
+            return $ ClosedOrderList $ zipWith ClosedOrderObject (HM.keys o) datas
 
 prettyClosedOrderList :: ClosedOrderList -> Doc
 prettyClosedOrderList (ClosedOrderList xs) = vcat (map prettyClosedOrderObject xs)

@@ -10,9 +10,7 @@ import           EasyLogger
 enableKrakenApiLogging :: LogDestination -> IO ()
 enableKrakenApiLogging = do
   $(initLogger)
-  enableRequestLogging
 
 disableKrakenApiLogging :: IO ()
 disableKrakenApiLogging = do
   $(finalizeLogger)
-  disableRequestLogging

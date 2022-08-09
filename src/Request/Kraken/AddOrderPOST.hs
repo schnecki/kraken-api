@@ -18,7 +18,6 @@ module Request.Kraken.AddOrderPOST
 import           ApiMaker
 import           Control.DeepSeq
 import           Data.Aeson
-import           Data.Aeson.KeyMap
 import           Data.Char                 (toLower)
 import           Data.Serialize
 import qualified Data.Text                 as T

@@ -9,7 +9,6 @@ module Data.Kraken.OpenOrderList
 
 import           Control.DeepSeq
 import           Data.Aeson
-import           Data.Aeson.KeyMap           (toHashMapText)
 import qualified Data.HashMap.Strict         as HM (elems, keys, lookup)
 import           Data.Serialize
 import           GHC.Generics
@@ -27,12 +26,11 @@ data OpenOrderList =
 instance FromJSON OpenOrderList where
   parseJSON =
     withObject "Data.Kraken.OpenOrderList" $ \open -> do
-      let mOpen = HM.lookup "open" (toHashMapText open)
+      let mOpen = HM.lookup "open" open
       flip (maybe (return $ OpenOrderList [])) mOpen $
         withObject "Data.Kraken.OpenOrderList open" $ \o -> do
-          let oHM = toHashMapText open
-          datas <- mapM parseJSON (HM.elems oHM)
-          return $ OpenOrderList $ zipWith OpenOrderObject (HM.keys $ oHM) datas
+          datas <- mapM parseJSON (HM.elems o)
+          return $ OpenOrderList $ zipWith OpenOrderObject (HM.keys o) datas
 
 prettyOpenOrderList :: OpenOrderList -> Doc
 prettyOpenOrderList (OpenOrderList xs) = vcat (map prettyOpenOrderObject xs)

@@ -7,6 +7,7 @@ module Data.Kraken.PriceValue
   , WorstPriceValue
   , prettyPriceValue
   , showPriceValue
+  , priceValueToDouble
   ) where
 
 import           Control.DeepSeq
@@ -32,7 +33,7 @@ newtype PriceValue =
 instance FromJSON PriceValue where
   parseJSON (String v) = maybe (fail $ "expected number, encounted " ++ unpack v) (return . PriceValue) (readMaybe $ unpack v)
   parseJSON (Number v) = return $ PriceValue (toRealFloat v)
-  parseJSON v = fail $ "Cannot parse non string to nubmer (value was '" ++ show v ++ "') in parseJSON of PriceValue"
+  parseJSON v          = fail $ "Cannot parse non string to nubmer (value was '" ++ show v ++ "') in parseJSON of PriceValue"
 
 instance ToJSON PriceValue where
   toJSON (PriceValue x) = String $ pack (printf "%.4f" x :: String)
@@ -43,4 +44,5 @@ prettyPriceValue = text . showPriceValue
 showPriceValue :: PriceValue -> String
 showPriceValue (PriceValue f) = printf "%.4f" f
 
-
+priceValueToDouble :: PriceValue -> Double
+priceValueToDouble (PriceValue x) = realToFrac x

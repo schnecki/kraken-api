@@ -9,11 +9,12 @@ module Request.Kraken.GetTradesGET
 
 import           ApiMaker
 
-import           Data.Kraken.DateTime
 import           Data.Kraken.RequestResult
 import           Data.Kraken.TradeList
 import           Data.Kraken.Types
 import           Request.Kraken.Class
+
+import           Text.Printf
 
 -- | Fetches trades.
 data GetTrades =
@@ -39,7 +40,7 @@ instance Request KrakenConfig GetTrades where
     where
       configs =
         "pair"  =:                p <>
-        "since"    `maybeQueryParam` fmap show mSince
+        "since"    `maybeQueryParam` fmap fmtInteger mSince
+      fmtInteger :: Integer -> String
+      fmtInteger = printf "%d"
   process _ _ resp = fromRequestResult (responseBody resp)
-
-

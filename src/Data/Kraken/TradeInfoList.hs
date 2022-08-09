@@ -9,7 +9,6 @@ module Data.Kraken.TradeInfoList
 
 import           Control.DeepSeq
 import           Data.Aeson
-import           Data.Aeson.KeyMap           (toHashMapText)
 import qualified Data.HashMap.Strict         as HM (elems, keys, lookup)
 import           Data.Serialize
 import           EasyLogger
@@ -31,9 +30,8 @@ instance FromJSON TradeInfoList where
   parseJSON =
     withObject "Data.Kraken.TradeInfoList" $ \o ->
       $(pureLogDebug) ("Data.Kraken.TradeInfoList parseJSON input: " ++ show o) $ do
-        let oHM = toHashMapText o
-        datas <- mapM parseJSON (HM.elems oHM)
-        return $ TradeInfoList $ zipWith TradeInfoObject (HM.keys oHM) datas
+        datas <- mapM parseJSON (HM.elems o)
+        return $ TradeInfoList $ zipWith TradeInfoObject (HM.keys o) datas
 
 prettyTradeInfoList :: TradeInfoList -> Doc
 prettyTradeInfoList (TradeInfoList xs) = vcat (map prettyTradeInfoObject xs)
