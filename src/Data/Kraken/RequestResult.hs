@@ -32,7 +32,9 @@ data RequestResult a = RequestResult
 
 fromRequestResult :: (MonadError SafeException m) => RequestResult a -> m a
 fromRequestResult (RequestResult [] (Just res)) = return res
-fromRequestResult (RequestResult err _)         = throwUserException $ EUnknownError $ T.intercalate ";" $ map tshow err
+fromRequestResult (RequestResult [err] _)       = throwUserException err
+fromRequestResult (RequestResult err _)         =
+  throwUserException $ EUnknownError $ "Multiple errors: " <> T.intercalate ";" (map tshow err)
 
 
 prettyRequestResult :: (a -> Doc) -> RequestResult a -> Doc
