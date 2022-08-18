@@ -157,5 +157,5 @@ instance Request KrakenConfig AddOrder where
   requestModifier = addNonceAndApiSign
   option _ AddOrder{} = return headerRFC3339DatetimeFormat
   process _ AddOrder{} resp = do
-    $(logPrintInfoText) $ "AddOrder response: " <> T.pack (show resp)
+    $(logDebugText) $ "AddOrder response: " <> T.pack (show resp)
     fromRequestResult (responseBody resp)
