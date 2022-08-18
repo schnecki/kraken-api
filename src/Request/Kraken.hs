@@ -5,6 +5,7 @@ module Request.Kraken
 import           Request.Kraken.Class                    as R
 
 import           Request.Kraken.AddOrderPOST             as R
+import           Request.Kraken.CancelAllOrdersPOST      as R
 import           Request.Kraken.GetAccountBalancePOST    as R
 import           Request.Kraken.GetAssetInfoGET          as R
 import           Request.Kraken.GetClosedOrdersPOST      as R

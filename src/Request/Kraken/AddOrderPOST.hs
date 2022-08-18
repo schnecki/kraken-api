@@ -3,9 +3,8 @@
 {-# LANGUAGE FlexibleContexts      #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE TypeFamilies          #-}
-
-
 module Request.Kraken.AddOrderPOST
   ( AddOrder(..)
   , AddOrderConfig (..)
@@ -23,6 +22,7 @@ import           Data.Serialize
 import qualified Data.Text                 as T
 import           Data.Time
 import           Data.Time.RFC3339
+import           EasyLogger
 import           GHC.Generics
 
 import           Data.Kraken.OrderAdded
@@ -95,7 +95,7 @@ data AddOrderConfig =
                                                       -- about orders in a particular group, with fewer API calls by using userref instead of our txid, where supported.
     , addOrderOrderType      :: AddOrderType          -- ^ Order type. Enum: "market" "limit" "stop-loss" "take-profit" "stop-loss-limit" "take-profit-limit" "settle-position"
     , addOrderType           :: OrderType             -- ^ Order direction (buy/sell). Enum: "buy" "sell"
-    , addOrderVolume         :: T.Text                -- ^ Order quantity in terms of the base asset. Note: Volume can be specified as 0 for closing margin orders to automatically fill the requisite
+    , addOrderVolume         :: Double                -- ^ Order quantity in terms of the base asset. Note: Volume can be specified as 0 for closing margin orders to automatically fill the requisite
                                                       -- quantity.
     , addOrderPair           :: InstrumentName        -- ^ Asset pair id or altname.
     , addOrderPrice          :: Maybe T.Text          -- ^ Price. Limit price for limit orders. Trigger price for stop-loss, stop-loss-limit, take-profit and take-profit-limit orders.
@@ -124,7 +124,7 @@ data AddOrderConfig =
                                                       -- independent orders that may reduce or increase net position.
     , addOrderClosePrice     :: Maybe T.Text          -- ^ Conditional close order price.
     , addOrderClosePrice2    :: Maybe T.Text          -- ^ Conditional close order price2
-    , addOrderDeadline       :: Maybe T.Text         -- ^ RFC3339 timestamp (e.g. 2021-04-01T00:18:45Z) after which the matching engine should reject the new order request, in presence of latency or
+    , addOrderDeadline       :: Maybe T.Text          -- ^ RFC3339 timestamp (e.g. 2021-04-01T00:18:45Z) after which the matching engine should reject the new order request, in presence of latency or
                                                       -- order queueing. min now() + 2 seconds, max now() + 60 seconds.
     , addOrderValidate       :: Maybe Bool            -- ^ Validate inputs only. Do not submit order. Default: false
     }
@@ -156,4 +156,6 @@ instance Request KrakenConfig AddOrder where
   response _ AddOrder {} = jsonResponse
   requestModifier = addNonceAndApiSign
   option _ AddOrder{} = return headerRFC3339DatetimeFormat
-  process _ AddOrder{} resp = fromRequestResult (responseBody resp)
+  process _ AddOrder{} resp = do
+    $(logPrintInfoText) $ "AddOrder response: " <> T.pack (show resp)
+    fromRequestResult (responseBody resp)

@@ -52,6 +52,7 @@ instance FromJSON TradeList where
 -- | During testing we found a Bug at the Kraken API. Sometimes Kraken seems to send wrong trades/data from other coins with other datetimes after some period of time. Hence, for security reasons, we
 -- rather perform a check here!
 checkInstrData :: [Trade] -> [Trade]
+-- checkInstrData xs = xs
 checkInstrData [] = []
 checkInstrData [x] = [x]
 checkInstrData xs = checkDataPoint startStats startXs restXs
@@ -66,10 +67,10 @@ checkInstrData xs = checkDataPoint startStats startXs restXs
         newDiffTime = fromIntegral $ abs $ dateTimeToSeconds (time x) - dateTimeToSeconds (time $ last acc)
         newExpPrice = (1 - alpha) * expPrice + alpha * priceValueToDouble (price x)
         newExpDiffTime = (1 - alpha) * expDiffTime + alpha * newDiffTime
-    normalPriceChange expPrice val = val >= 0.2 * expPrice && val <= 5 * expPrice
-    normalTimeStep expTimeDiff newDiffTime = newDiffTime <= 30 * expTimeDiff
-    alpha = 0.1
-    (startXs, restXs) = splitAt 10 xs
+    normalPriceChange expPrice val = val >= 0.1 * expPrice && val <= 10 * expPrice
+    normalTimeStep expTimeDiff newDiffTime = newDiffTime <= 50 * expTimeDiff
+    alpha = 0.05
+    (startXs, restXs) = splitAt 30 xs
     startStats = (startPrice, startDiffTime)
     startPrice = sum (map (priceValueToDouble . price) startXs) / fromIntegral (length startXs)
     startDiffTime = sum diffTimes / max 1 (fromIntegral $ length diffTimes)
