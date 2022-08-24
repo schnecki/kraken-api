@@ -26,6 +26,7 @@ import           Data.Kraken.Util
 
 import           Debug.Trace
 
+
 data OrderDescription =
   OrderDescription
     { pair      :: T.Text         -- ^ asset pair
