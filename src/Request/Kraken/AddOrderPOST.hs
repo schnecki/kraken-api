@@ -95,7 +95,7 @@ data AddOrderConfig =
                                                       -- about orders in a particular group, with fewer API calls by using userref instead of our txid, where supported.
     , addOrderOrderType      :: AddOrderType          -- ^ Order type. Enum: "market" "limit" "stop-loss" "take-profit" "stop-loss-limit" "take-profit-limit" "settle-position"
     , addOrderType           :: OrderType             -- ^ Order direction (buy/sell). Enum: "buy" "sell"
-    , addOrderVolume         :: Double                -- ^ Order quantity in terms of the base asset. Note: Volume can be specified as 0 for closing margin orders to automatically fill the requisite
+    , addOrderVolume         :: T.Text                -- ^ Order quantity in terms of the base asset. Note: Volume can be specified as 0 for closing margin orders to automatically fill the requisite
                                                       -- quantity.
     , addOrderPair           :: InstrumentName        -- ^ Asset pair id or altname.
     , addOrderPrice          :: Maybe T.Text          -- ^ Price. Limit price for limit orders. Trigger price for stop-loss, stop-loss-limit, take-profit and take-profit-limit orders.

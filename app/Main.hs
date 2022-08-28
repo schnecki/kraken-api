@@ -104,7 +104,7 @@ main = do
       liftIO $ print $ prettyTradeHistoryList $ TradeHistoryList res' (length res')
 
 
-      res <- mkReq $ AddOrder $ AddOrderConfig Nothing AddOrderMarket Buy 0.1 "XXBTZUSD" Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing (Just AddOrderStopLoss) (Just "20000") Nothing Nothing (Just True)
+      res <- mkReq $ AddOrder $ AddOrderConfig Nothing AddOrderMarket Buy "0.1" "XXBTZUSD" Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing Nothing (Just AddOrderStopLoss) (Just "20000") Nothing Nothing (Just True)
       liftIO $ print $ prettyOrderAdded res
 
       -- clOrds <- mkReq $ GetClosedOrders (ClosedOrdersConfig Nothing Nothing Nothing Nothing Nothing Nothing)

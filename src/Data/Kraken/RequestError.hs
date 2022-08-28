@@ -77,8 +77,7 @@ instance FromJSON RequestError where
    where
      parseJSONTxt t
        | T.isPrefixOf "EService:Unavailable" t = return EServiceUnavailable
-       -- | T.isPrefixOf "EService:Unavailable" t = EService:Unavailable
-       | T.isPrefixOf "EGeneral:Invalid arguments" t = return $ EGeneralInvalidArguments $ T.drop (T.length "EGeneral:Invalid arguments") t
+       | T.isPrefixOf "EGeneral:Invalid arguments" t = return $ EGeneralInvalidArguments $ T.drop (T.length "EGeneral:Invalid arguments:") t
        -- | T.isPrefixOf "EGeneral:Invalid arguments:Index unavailable" t = EGeneralInvalidArguments:Index unavailable
        -- | T.isPrefixOf "EService:Market in cancel_only mode" t = EServiceMarketInCancelOnlyMode $ "EService:Market in cancel_only mode"
        -- | T.isPrefixOf "EService:Market in post_only mode" t = EService:Market in post_only mode
@@ -101,5 +100,3 @@ instance FromJSON RequestError where
        | otherwise = return $ EUnknownError ("TODO: Implemented parseJSON from RequestError!!!\n" <> v)
 
   parseJSON v = fail $ "Cannot parse non string to UTCTime (value was '" ++ show v ++ "') in parseJSON of DateTime"
-
-
