@@ -9,8 +9,11 @@ module Request.Kraken.GetTradesGET
 
 import           ApiMaker
 
+import           Data.Kraken.DateTime
 import           Data.Kraken.RequestResult
+import           Data.Kraken.Trade         (time)
 import           Data.Kraken.TradeList
+import           Data.Kraken.TradeObject
 import           Data.Kraken.Types
 import           Request.Kraken.Class
 
@@ -38,9 +41,11 @@ instance Request KrakenConfig GetTrades where
   response _ GetTrades {} = jsonResponse
   option _ (GetTrades (TradesConfig p mSince)) = return $ headerRFC3339DatetimeFormat <> configs
     where
-      configs =
-        "pair"  =:                p <>
-        "since"    `maybeQueryParam` fmap fmtInteger mSince
+      configs = "pair" =: p <> "since" `maybeQueryParam` fmap fmtInteger mSince
       fmtInteger :: Integer -> String
       fmtInteger = printf "%d"
-  process _ _ resp = fromRequestResult (responseBody resp)
+  process _ (GetTrades (TradesConfig _ mSince)) resp = -- filterSince <$>
+    fromRequestResult (responseBody resp) -- Kraken sometimes returns data from very long ago
+    where
+      filterSince (TradeList lst objs) = maybe (TradeList lst objs) (\since -> TradeList lst (map (filterSinceTrObj since) objs)) mSince
+      filterSinceTrObj since (TradeObject instr trds) = TradeObject instr (filter ((>= since) . dateTimeToNanoSeconds . time) trds)

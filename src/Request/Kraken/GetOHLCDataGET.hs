@@ -29,7 +29,7 @@ data GetOHLCData =
 data OHLCDataConfig = OHLCDataConfig
   { ohlcDataPair     :: PairName                     -- ^ Example: pair=XXBTCZUSD,XETHXXBT
   , ohlcDataInterval :: Maybe CandlestickGranularity -- ^ Time frame interval in minutes. Example: interval=60.
-  , ohlcDataSince    :: Maybe Integer               -- ^ Return committed OHLC data since given ID. Example: Since=1548111600.
+  , ohlcDataSince    :: Maybe Integer                -- ^ Return committed OHLC data since given ID. Example: Since=1548111600.
   } deriving (Show, Read, Eq, Ord)
 
 
@@ -49,5 +49,3 @@ instance Request KrakenConfig GetOHLCData where
         "interval" `maybeQueryParam` fmap (show . candlestickGranularityInMinutes) mInt <>
         "since"    `maybeQueryParam` fmap show mSince
   process _ (GetOHLCData cfg) resp = setTickDataListGranularity (fromMaybe M1 $ ohlcDataInterval cfg) <$> fromRequestResult (responseBody resp)
-
-

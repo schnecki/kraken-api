@@ -29,7 +29,7 @@ data TickData =
     , close  :: PriceValue
     , vwap   :: PriceValue -- ^ Volume weighted average price
     , volume :: Double     -- ^ Volume
-    , count  :: Int        -- ^ Trade count (?)
+    , count  :: Int        -- ^ Trade count
     }
   deriving (Read, Show, Eq, Ord, Generic, NFData, ToJSON, Serialize)
 
