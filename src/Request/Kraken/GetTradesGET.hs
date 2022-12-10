@@ -44,7 +44,7 @@ instance Request KrakenConfig GetTrades where
       configs = "pair" =: p <> "since" `maybeQueryParam` fmap fmtInteger mSince
       fmtInteger :: Integer -> String
       fmtInteger = printf "%d"
-  process _ (GetTrades (TradesConfig _ mSince)) resp = -- filterSince <$>
+  process _ (GetTrades (TradesConfig _ mSince)) resp = filterSince <$>
     fromRequestResult (responseBody resp) -- Kraken sometimes returns data from very long ago
     where
       filterSince (TradeList lst objs) = maybe (TradeList lst objs) (\since -> TradeList lst (map (filterSinceTrObj since) objs)) mSince

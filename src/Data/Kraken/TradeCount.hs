@@ -29,7 +29,7 @@ data TradeCount =
 instance FromJSON TradeCount where
   parseJSON =
     withArray "Data.Kraken.TradeCount" $ \arr -> do
-      unless (V.length arr == 2) $ fail ("Expected array of length 2, encountedered: " ++ show arr)
+      unless (V.length arr == 2) $ warn "TradeCount" ("Expected array of length 2, encountedered: " ++ show arr)
       TradeCount <$> (parseJSON =<< parseStrToNum (arr V.! 0)) <*> (parseJSON =<< parseStrToNum (arr V.! 1))
 
 
@@ -41,4 +41,3 @@ prettyTradeCountWith nesting (TradeCount t l24) =
   colName "today"           $$ nest n2 (int t) $+$
   colName "last 24 hours"   $$ nest n2 (int l24)
   where n2 = nestCols - nesting
-

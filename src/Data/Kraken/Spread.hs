@@ -34,7 +34,7 @@ data Spread =
 instance FromJSON Spread where
   parseJSON =
     withArray "Data.Kraken.Spread" $ \arr -> do
-      unless (V.length arr == 3) $ fail ("Expected an array of length 3, but encountered: " ++ show arr)
+      unless (V.length arr == 3) $ warn "Spread" ("Expected an array of length 3, but encountered: " ++ show arr)
       ti <- posixTimeToDateTime <$> parseJSON (arr V.! 0)
       bi <- parseJSON =<< parseStrToNum (arr V.! 1)
       as <- parseJSON =<< parseStrToNum (arr V.! 2)

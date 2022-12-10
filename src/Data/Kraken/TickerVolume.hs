@@ -28,7 +28,7 @@ data TickerVolume =
 instance FromJSON TickerVolume where
   parseJSON =
     withArray "Data.Kraken.TickerVolume" $ \arr -> do
-      unless (V.length arr == 2) $ fail ("Expected array of length 2, encountedered: " ++ show arr)
+      unless (V.length arr == 2) $ warn "TickerVolume" ("Expected array of length 2, encountedered: " ++ show arr)
       TickerVolume <$> (parseJSON =<< parseStrToNum (arr V.! 0)) <*> (parseJSON =<< parseStrToNum (arr V.! 1))
 
 prettyTickerVolume :: TickerVolume -> Doc

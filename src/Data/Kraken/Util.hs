@@ -2,9 +2,11 @@
 {-# LANGUAGE GADTs             #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PolyKinds         #-}
+{-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE TypeFamilies      #-}
 module Data.Kraken.Util
-    ( parseStrToNum
+    ( warn
+    , parseStrToNum
     , parseStrToDouble
     , parseMaybeStrToDouble
     , parseToStr
@@ -24,16 +26,35 @@ module Data.Kraken.Util
     , lowerCase
     ) where
 
+import           Control.Concurrent (threadDelay)
+import           Control.Monad      (unless)
 import           Data.Aeson
 import           Data.Aeson.Casing
 import           Data.Aeson.Types
-import           Data.Char         (toLower)
-import           Data.List         (intersperse)
-import qualified Data.Text         as T
-import           Data.Vector       (toList)
-import           Prelude           hiding ((<>))
+import           Data.Char          (toLower)
+import           Data.IORef
+import           Data.List          (intersperse)
+import qualified Data.Text          as T
+import           Data.Vector        (toList)
+import           EasyLogger
+import           Prelude            hiding ((<>))
+import           System.IO.Unsafe   (unsafePerformIO)
 import           Text.PrettyPrint
-import           Text.Read         (readMaybe)
+import           Text.Read          (readMaybe)
+
+
+warnings :: IORef [String]
+warnings = unsafePerformIO $ newIORef []
+
+
+warn :: String -> String -> Parser ()
+warn key txt = return $ unsafePerformIO $ do
+  warns <- readIORef warnings
+  let warned = key `elem` warns
+  unless warned $ do
+    $(logPrintErrorText) (T.pack $ txt ++ ". This warning is only displayed once. Pausing for 10 secs..")
+    threadDelay (10 * 10 ^ 6)
+  writeIORef warnings (key : warns)
 
 
 parseStrToNum :: Value -> Parser Value

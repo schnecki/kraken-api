@@ -47,7 +47,7 @@ instance FromJSON TradeList where
         let tradeObjs = zipWith (\instr -> TradeObject instr . checkInstrData) (HM.keys oWoLast) datas
             lastComp | null (concatMap trades tradeObjs) = Nothing
                      | otherwise = Just . maximum $ concatMap (map (dateTimeToNanoSeconds . time) . trades) tradeObjs
-        return $ TradeList lastComp tradeObjs
+        return $ $(pureLogPrintInfoText) ("End of parsing. tradeLast: " <> tshow (nanoSecondsToDateTime <$> lastComp)) $ TradeList lastComp tradeObjs
 
 -- | During testing we found a Bug at the Kraken API. Sometimes Kraken seems to send wrong trades/data from other coins with other datetimes after some period of time. Hence, for security reasons, we
 -- rather perform a check here!
@@ -61,8 +61,13 @@ checkInstrData xs@(first:_) = checkDataPoint startStats startXs restXs
     checkDataPoint (expPrice, expDiffTime) acc (x:xs')
       | timePositive && normalPriceChange expPrice newPriceValue && normalTimeStep expDiffTime newDiffTime = checkDataPoint (newExpPrice, newExpDiffTime) (acc ++ [x]) xs'
       | otherwise =
-          $(pureLogPrintInfoText) ("Used data: " <> tshow (length acc) <> "/" <> tshow (length xs) <> ". Decision: " <> T.pack (show (timePositive, normalPriceChange expPrice newPriceValue, normalTimeStep expDiffTime newDiffTime)))
-          $(pureLogPrintInfoText) ("newDiffTime <= 50 * expTimeDiff: " <> T.pack  (show (newDiffTime, 50 * expDiffTime)) <> ", Calc: " <> T.pack (show(time x , time (last acc), dateTimeToNanoSeconds (time x) , dateTimeToNanoSeconds (time $ last acc))))
+          $(pureLogPrintInfoText) ("Rejecting data. Used data: " <> tshow (length acc) <> "/" <> tshow (length xs) <> ". Time pos, Norm delta price, Normal time step: " <>
+                                   T.pack (show (timePositive, normalPriceChange expPrice newPriceValue, normalTimeStep expDiffTime newDiffTime)))
+          $(pureLogPrintInfoText) (if timePositive then "" else "Last data point: " <> tshow (time $ last acc) <> ". Rejecting data from: " <> tshow (time x))
+          $(pureLogPrintInfoText) (if normalPriceChange expPrice newPriceValue then "" else ("Price new, Price Last: " <> tshow (newPriceValue, priceValueToDouble $ price (last acc))))
+          $(pureLogPrintInfoText) (if normalTimeStep expDiffTime newDiffTime then "" else
+                                     "newDiffTime <= 50 * expTimeDiff: " <> T.pack  (show (newDiffTime, 50 * expDiffTime)) <> ", (Time new, Time last): " <> T.pack (show (time x, time (last acc))))
+
           acc
       where
         newPriceValue = priceValueToDouble $ price x
@@ -70,7 +75,7 @@ checkInstrData xs@(first:_) = checkDataPoint startStats startXs restXs
         timePositive = dateTimeToNanoSeconds (time x) > dateTimeToNanoSeconds (time $ last acc) && dateTimeToNanoSeconds (time x) > dateTimeToNanoSeconds (time first)
         newExpPrice = (1 - alpha) * expPrice + alpha * priceValueToDouble (price x)
         newExpDiffTime = (1 - alpha) * expDiffTime + alpha * newDiffTime
-    minDiffTime = 1 * 10^8
+    minDiffTime = 10^9
     normalPriceChange expPrice val = val >= 0.1 * expPrice && val <= 10 * expPrice
     normalTimeStep expTimeDiff newDiffTime = newDiffTime <= 50 * expTimeDiff || newDiffTime < 3 * 1e9
     alpha = 0.05

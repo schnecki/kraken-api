@@ -32,7 +32,7 @@ data OrderBook =
 instance FromJSON OrderBook where
   parseJSON =
     withArray "Data.Kraken.OrderBook" $ \arr -> do
-      unless (V.length arr == 3) $ fail ("Expected an array of length 3, but encountered: " ++ show arr)
+      unless (V.length arr == 3) $ warn "Orderbook" ("Expected an array of length 3, but encountered: " ++ show arr)
       pr <- parseJSON =<< parseStrToNum (arr V.! 0)
       vo <- parseJSON =<< parseStrToNum (arr V.! 1)
       ti <- secondsToDateTime <$> parseJSON (arr V.! 2)

@@ -37,7 +37,7 @@ data TickData =
 instance FromJSON TickData where
   parseJSON =
     withArray "Data.Kraken.TickData" $ \arr -> do
-      unless (V.length arr == 8) $ fail ("Expected an array of length 8, but encountered: " ++ show arr)
+      unless (V.length arr == 8) $ warn "TickData" ("Expected an array of length 8, but encountered: " ++ show arr)
       ti <- secondsToDateTime <$> parseJSON (arr V.! 0)
       op <- parseJSON (arr V.! 1)
       hi <- parseJSON (arr V.! 2)

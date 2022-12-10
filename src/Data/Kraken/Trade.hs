@@ -35,17 +35,28 @@ data Trade =
     }
   deriving (Read, Show, Eq, Ord, Generic, NFData, Serialize)
 
+-- [String \"16775.00000\",
+--  , String \"0.00011010\",
+--  , Number 1.668546834422194e9,
+--  , String \"s\",
+--  , String \"m\",
+--  , String \"\",
+--  , Number 5.328663e7
+-- ]"
+
 
 instance FromJSON Trade where
   parseJSON =
     withArray "Data.Kraken.Trade" $ \arr -> do
-      unless (V.length arr == 6) $ fail ("Expected an array of length 6, but encountered: " ++ show arr)
+      unless (V.length arr == 6) $ warn "Trade" ("Expected an array of length 6, but encountered: " ++ show arr)
+      -- when (V.length arr == 7) $ fail ("Expected an array of length 6, but encountered: " ++ show arr)
       pr <- parseJSON (arr V.! 0)
       vo <- parseJSON =<< parseStrToNum (arr V.! 1)
       ti <- posixTimeToDateTime . fromRational <$> parseJSON (arr V.! 2)
       tp <- parseJSON (arr V.! 3)
       ot <- parseJSON (arr V.! 4)
       mi <- parseJSON (arr V.! 5)
+      -- (unknown :: Double) <- parseJSON (arr V.! 6)
       return $ Trade pr vo ti tp ot mi
 
 

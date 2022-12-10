@@ -9,6 +9,7 @@ module Data.Kraken.Candlestick
     ) where
 
 import           Control.DeepSeq
+import           Control.Monad          (when)
 import           Data.Aeson
 import           Data.Aeson.Types
 import           Data.Serialize
@@ -45,7 +46,8 @@ prettyCandlestickWith nesting (Candlestick p w l) =
 
 parseCandlestickFromList :: Value -> Parser Candlestick
 parseCandlestickFromList =
-  withArray "Data.Kraken.Candlestick: Array of Doubles" $ \arr ->
+  withArray "Data.Kraken.Candlestick: Array of Doubles" $ \arr -> do
+    when (V.length arr > 3) $ warn "Candlestick" ("Expected an array of max length 3, but encountered: " ++ show arr)
     if V.length arr == 3
       then Candlestick <$> parseJSON (arr V.! 0) <*> (Just <$> (parseJSON =<< parseStrToNum (arr V.! 1) :: Parser Double)) <*> (parseJSON =<< parseStrToNum (arr V.! 2))
       else if V.length arr == 2
