@@ -77,7 +77,7 @@ checkInstrData xs@(first:_) = checkDataPoint startStats startXs restXs
         newExpDiffTime = (1 - alpha) * expDiffTime + alpha * newDiffTime
     minDiffTime = 10^9
     normalPriceChange expPrice val = val >= 0.1 * expPrice && val <= 10 * expPrice
-    normalTimeStep expTimeDiff newDiffTime = newDiffTime <= 50 * expTimeDiff || newDiffTime < 3 * 1e9
+    normalTimeStep expTimeDiff newDiffTime = newDiffTime <= 50 * expTimeDiff || newDiffTime < 5 * 60 * 1e9
     alpha = 0.05
     (startXs, restXs) = splitAt 10 xs
     startStats = (startPrice, startDiffTime)
