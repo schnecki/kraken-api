@@ -39,15 +39,20 @@ allTrades = concatMap trades . tradeList
 
 instance FromJSON TradeList where
   parseJSON =
-    withObject "Data.Kraken.TradeList" $ \o ->
-      $(pureLogDebug) ("Data.Kraken.TradeList parseJSON input: " ++ show o) $ do
-        -- last' <- (o .: "last") >>= parseStrToNum >>= parseJSON
-        let oWoLast = HM.filterWithKey (\k _ -> k /= "last") o
-        datas <- mapM (withArray "Data.Kraken.TradeList parsing Trades" $ fmap V.toList . mapM parseJSON) (HM.elems oWoLast)
-        let tradeObjs = zipWith (\instr -> TradeObject instr . checkInstrData) (HM.keys oWoLast) datas
-            lastComp | null (concatMap trades tradeObjs) = Nothing
-                     | otherwise = Just . maximum $ concatMap (map (dateTimeToNanoSeconds . time) . trades) tradeObjs
-        return $ $(pureLogPrintInfoText) ("End of parsing. tradeLast: " <> tshow (nanoSecondsToDateTime <$> lastComp)) $ TradeList lastComp tradeObjs
+    withObject "Data.Kraken.TradeList" $ \o -> do
+    -- last' <- (o .: "last") >>= parseStrToNum >>= parseJSON
+      let oWoLast = HM.filterWithKey (\k _ -> k /= "last") o
+      datas <- mapM (withArray "Data.Kraken.TradeList parsing Trades" $ fmap V.toList . mapM parseJSON) (HM.elems oWoLast)
+      let tradeObjs = zipWith (\instr -> TradeObject instr . checkInstrData) (HM.keys oWoLast) datas
+          nanoSecs = concatMap (map (dateTimeToNanoSeconds . time) . trades) tradeObjs
+          lastComp
+            | null nanoSecs = Nothing
+            | otherwise = Just . maximum $ nanoSecs -- concatMap (map (dateTimeToNanoSeconds . time) . trades) tradeObjs
+      return $
+        $(pureLogPrintInfoText)
+          ("End of parsing. After filtering: " <>
+           tshow (sum $ map (length . trades) tradeObjs) <> "/" <> tshow (sum $ map length datas) <> ". tradeLast: " <> tshow (nanoSecondsToDateTime <$> lastComp)) $
+        TradeList lastComp tradeObjs
 
 -- | During testing we found a Bug at the Kraken API. Sometimes Kraken seems to send wrong trades/data from other coins with other datetimes after some period of time. Hence, for security reasons, we
 -- rather perform a check here!
@@ -75,9 +80,9 @@ checkInstrData xs@(first:_) = checkDataPoint startStats startXs restXs
         timePositive = dateTimeToNanoSeconds (time x) > dateTimeToNanoSeconds (time $ last acc) && dateTimeToNanoSeconds (time x) > dateTimeToNanoSeconds (time first)
         newExpPrice = (1 - alpha) * expPrice + alpha * priceValueToDouble (price x)
         newExpDiffTime = (1 - alpha) * expDiffTime + alpha * newDiffTime
-    minDiffTime = 10^9
+    minDiffTime = 10*10^9
     normalPriceChange expPrice val = val >= 0.1 * expPrice && val <= 10 * expPrice
-    normalTimeStep expTimeDiff newDiffTime = newDiffTime <= 50 * expTimeDiff || newDiffTime < 5 * 60 * 1e9
+    normalTimeStep expTimeDiff newDiffTime = newDiffTime <= 100 * expTimeDiff || newDiffTime < 30 * 60 * 10^9
     alpha = 0.05
     (startXs, restXs) = splitAt 10 xs
     startStats = (startPrice, startDiffTime)

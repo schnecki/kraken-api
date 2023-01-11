@@ -8,6 +8,7 @@ module Data.Kraken.Trade
     ) where
 
 
+import           Control.Applicative        ((<|>))
 import           Control.DeepSeq
 import           Control.Monad              (unless)
 import           Data.Aeson
@@ -32,8 +33,13 @@ data Trade =
     , tradeType      :: OrderType
     , tradeOrderType :: TradeOrderType
     , miscellaneous  :: T.Text
+    , tradeId        :: Integer -- ^ Set to -1 if not available. Exists in API since Dec. 2022.
     }
-  deriving (Read, Show, Eq, Ord, Generic, NFData, Serialize)
+  deriving (Read, Show, Eq, Ord, Generic, NFData)
+
+instance Serialize Trade where
+  get = Trade <$> get <*> get <*> get <*> get <*> get <*> get <*> (get <|> pure (-1))
+
 
 -- [String \"16775.00000\",
 --  , String \"0.00011010\",
@@ -48,16 +54,15 @@ data Trade =
 instance FromJSON Trade where
   parseJSON =
     withArray "Data.Kraken.Trade" $ \arr -> do
-      unless (V.length arr == 6) $ warn "Trade" ("Expected an array of length 6, but encountered: " ++ show arr)
-      -- when (V.length arr == 7) $ fail ("Expected an array of length 6, but encountered: " ++ show arr)
+      unless (V.length arr == 7) $ warn "Trade" ("Expected an array of length 7, but encountered: " ++ show arr)
       pr <- parseJSON (arr V.! 0)
       vo <- parseJSON =<< parseStrToNum (arr V.! 1)
       ti <- posixTimeToDateTime . fromRational <$> parseJSON (arr V.! 2)
       tp <- parseJSON (arr V.! 3)
       ot <- parseJSON (arr V.! 4)
       mi <- parseJSON (arr V.! 5)
-      -- (unknown :: Double) <- parseJSON (arr V.! 6)
-      return $ Trade pr vo ti tp ot mi
+      tradeId <- parseJSON (arr V.! 6)
+      return $ Trade pr vo ti tp ot mi tradeId
 
 
 prettyTrade :: Trade -> Doc

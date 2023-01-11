@@ -48,13 +48,16 @@ warnings = unsafePerformIO $ newIORef []
 
 
 warn :: String -> String -> Parser ()
-warn key txt = return $ unsafePerformIO $ do
-  warns <- readIORef warnings
-  let warned = key `elem` warns
-  unless warned $ do
-    $(logPrintErrorText) (T.pack $ txt ++ ". This warning is only displayed once. Pausing for 10 secs..")
-    threadDelay (10 * 10 ^ 6)
-  writeIORef warnings (key : warns)
+warn key txt = warn' `seq` return ()
+  where
+    warn' =
+      unsafePerformIO $ do
+        warns <- readIORef warnings
+        let warned = key `elem` warns
+        unless warned $ do
+          $(logPrintErrorText) (T.pack $ txt ++ ". This warning is only displayed once. Pausing for 10 secs..")
+          threadDelay (10 * 10 ^ 6)
+          writeIORef warnings (key : warns)
 
 
 parseStrToNum :: Value -> Parser Value
