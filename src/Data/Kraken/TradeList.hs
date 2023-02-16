@@ -10,7 +10,8 @@ module Data.Kraken.TradeList
 
 import           Control.DeepSeq
 import           Data.Aeson
-import qualified Data.HashMap.Strict     as HM (elems, filterWithKey, keys)
+import           Data.Aeson.Key
+import qualified Data.Aeson.KeyMap       as HM
 import           Data.List
 import           Data.Serialize
 import qualified Data.Text               as T
@@ -43,7 +44,7 @@ instance FromJSON TradeList where
     -- last' <- (o .: "last") >>= parseStrToNum >>= parseJSON
       let oWoLast = HM.filterWithKey (\k _ -> k /= "last") o
       datas <- mapM (withArray "Data.Kraken.TradeList parsing Trades" $ fmap V.toList . mapM parseJSON) (HM.elems oWoLast)
-      let tradeObjs = zipWith (\instr -> TradeObject instr . checkInstrData) (HM.keys oWoLast) datas
+      let tradeObjs = zipWith (\instr -> TradeObject (toText instr) . checkInstrData) (HM.keys oWoLast) datas
           nanoSecs = concatMap (map (dateTimeToNanoSeconds . time) . trades) tradeObjs
           lastComp
             | null nanoSecs = Nothing
@@ -100,7 +101,7 @@ checkInstrData xs@(first:_) = checkDataPoint startStats startXs restXs
 --       datas <- mapM (withArray "Data.Kraken.TradeList parsing Trades" $ \o' -> V.toList <$> mapM parseJSON o') (mkElems oHM)
 --       return $ TradeList last' $ zipWith TradeObject (mkKeys oHM) datas
 --     where
---       mkKeys o = filter (/= "last") (HM.keys o)
+--       mkKeys o = filter (/= "last") (map toText . HM.keys $ o)
 --       mkElems o = HM.elems $ HM.filterWithKey (\k _ -> k /= "last") o
 
 

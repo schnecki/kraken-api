@@ -8,6 +8,8 @@ module Data.Kraken.AccountBalanceList
 
 import           Control.DeepSeq
 import           Data.Aeson
+import           Data.Aeson.Key
+import qualified Data.Aeson.KeyMap          as HM
 import           Data.HashMap.Strict        (elems, keys)
 import           Data.Serialize
 import           GHC.Generics
@@ -24,7 +26,7 @@ data AccountBalanceList =
 
 
 instance FromJSON AccountBalanceList where
-  parseJSON val = withObject "Data.Kraken.AccountBalanceList" (\o -> AccountBalanceList . zipWith AccountBalance (keys o) <$> mapM parseJSON (elems o)) val
+  parseJSON val = withObject "Data.Kraken.AccountBalanceList" (\o -> AccountBalanceList . zipWith AccountBalance (map toText . HM.keys $ o) <$> mapM parseJSON (HM.elems o)) val
 
 
 prettyAccountBalanceList :: AccountBalanceList -> Doc

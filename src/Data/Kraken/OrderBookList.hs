@@ -10,7 +10,8 @@ module Data.Kraken.OrderBookList
 import           Control.DeepSeq
 import           Control.Monad               (zipWithM)
 import           Data.Aeson
-import qualified Data.HashMap.Strict         as HM (elems, keys)
+import           Data.Aeson.Key
+import qualified Data.Aeson.KeyMap           as HM
 import           Data.Serialize
 import           GHC.Generics
 import           Text.PrettyPrint
@@ -26,7 +27,7 @@ data OrderBookList =
 
 
 instance FromJSON OrderBookList where
-  parseJSON = withObject "Data.Kraken.OrderBookList" $ \o -> OrderBookList <$> zipWithM f (HM.keys o) (HM.elems o)
+  parseJSON = withObject "Data.Kraken.OrderBookList" $ \o -> OrderBookList <$> zipWithM f (map toText . HM.keys $ o) (HM.elems o)
     where
       f k =
         withObject "Data.Kraken.OrderBookList parsing OrderBookObject" $ \x -> do

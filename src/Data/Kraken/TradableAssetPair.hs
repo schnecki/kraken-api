@@ -10,7 +10,7 @@ module Data.Kraken.TradableAssetPair
 import           Control.Applicative      ((<|>))
 import           Control.DeepSeq
 import           Data.Aeson
-import qualified Data.HashMap.Strict      as HM
+import qualified Data.Aeson.KeyMap        as HM
 import           Data.Serialize
 import           Data.Serialize.Text      ()
 import qualified Data.Text                as T

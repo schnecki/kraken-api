@@ -13,6 +13,7 @@ import           Control.Applicative        ((<|>))
 import           Control.DeepSeq
 import           Control.Monad.Trans
 import           Data.Aeson
+import           Data.Aeson.Key
 import           Data.Serialize
 import           Data.Serialize.Text        ()
 import qualified Data.Text                  as T

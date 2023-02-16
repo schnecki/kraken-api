@@ -9,7 +9,8 @@ module Data.Kraken.PositionList
 
 import           Control.DeepSeq
 import           Data.Aeson
-import qualified Data.HashMap.Strict        as HM
+import           Data.Aeson.Key
+import qualified Data.Aeson.KeyMap          as HM
 import           Data.Serialize
 import           GHC.Generics
 import           Text.PrettyPrint
@@ -27,7 +28,7 @@ instance FromJSON PositionList where
   parseJSON =
     withObject "Data.Kraken.PositionList" $ \o -> do
     datas <- mapM parseJSON (HM.elems o)
-    return $ PositionList $ zipWith PositionObject (HM.keys o) datas
+    return $ PositionList $ zipWith PositionObject (map toText . HM.keys $ o) datas
 
 prettyPositionList :: PositionList -> Doc
 prettyPositionList (PositionList xs) = vcat (map prettyPositionObject xs)

@@ -8,7 +8,8 @@ module Data.Kraken.SpreadList
 
 import           Control.DeepSeq
 import           Data.Aeson
-import qualified Data.HashMap.Strict      as HM (elems, filterWithKey, keys)
+import           Data.Aeson.Key
+import qualified Data.Aeson.KeyMap        as HM
 import           Data.Serialize
 import qualified Data.Vector              as V
 import           GHC.Generics
@@ -32,7 +33,7 @@ instance FromJSON SpreadList where
       datas <- mapM (withArray "Data.Kraken.SpreadList parsing Spreads" $ fmap V.toList . mapM parseJSON) (mkElems o)
       return $ SpreadList last' $ zipWith SpreadObject (mkKeys o) datas
     where
-      mkKeys o = filter (/= "last") (HM.keys o)
+      mkKeys o = filter (/= "last") (map toText . HM.keys $ o)
       mkElems o = HM.elems $ HM.filterWithKey (\k _ -> k /= "last") o
 
 

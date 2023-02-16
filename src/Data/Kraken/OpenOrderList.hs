@@ -9,7 +9,8 @@ module Data.Kraken.OpenOrderList
 
 import           Control.DeepSeq
 import           Data.Aeson
-import qualified Data.HashMap.Strict         as HM (elems, keys, lookup)
+import           Data.Aeson.Key
+import qualified Data.Aeson.KeyMap           as HM
 import           Data.Serialize
 import           GHC.Generics
 import           Text.PrettyPrint
@@ -30,7 +31,7 @@ instance FromJSON OpenOrderList where
       flip (maybe (return $ OpenOrderList [])) mOpen $
         withObject "Data.Kraken.OpenOrderList open" $ \o -> do
           datas <- mapM parseJSON (HM.elems o)
-          return $ OpenOrderList $ zipWith OpenOrderObject (HM.keys o) datas
+          return $ OpenOrderList $ zipWith OpenOrderObject (map toText . HM.keys $ o) datas
 
 prettyOpenOrderList :: OpenOrderList -> Doc
 prettyOpenOrderList (OpenOrderList xs) = vcat (map prettyOpenOrderObject xs)

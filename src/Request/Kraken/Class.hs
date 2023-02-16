@@ -37,13 +37,14 @@ import           Control.Monad.Trans.State
 import qualified Crypto.Hash.SHA256                         as SHA256
 import qualified Crypto.Hash.SHA512                         as SHA512
 import           Data.Aeson
+import           Data.Aeson.Key
+import qualified Data.Aeson.KeyMap                          as HM
 import           Data.Bifunctor                             (bimap)
 import qualified Data.ByteString                            as B
 import qualified Data.ByteString                            as BS
 import           Data.ByteString.Builder
 import qualified Data.ByteString.Internal                   as B
 import           Data.Char
-import qualified Data.HashMap.Strict                        as HM
 import           Data.List                                  (foldl')
 import           Data.Maybe                                 (fromMaybe)
 import           Data.Text.Internal.Unsafe.Char
@@ -149,7 +150,7 @@ data Obj =
     }
 
 instance FromJSON Obj where
-  parseJSON = withObject "Data.Kraken.Class.Obj" $ \o -> Obj . zip (map E.encodeUtf8 $ HM.keys o) . map (fmap E.encodeUtf8) <$> mapM (parseToStr >=> parseJSON) (HM.elems o)
+  parseJSON = withObject "Data.Kraken.Class.Obj" $ \o -> Obj . zip (map (E.encodeUtf8 . toText) . HM.keys $ o) . map (fmap E.encodeUtf8) <$> mapM (parseToStr >=> parseJSON) (HM.elems o)
 
 -- | Parses the arguments ByteString to a list of arguments, in order to generate the API Signature requested by Kraken.
 parseBSList :: BL.ByteString -> [(B.ByteString, Maybe B.ByteString)]

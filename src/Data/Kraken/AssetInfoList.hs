@@ -8,7 +8,8 @@ module Data.Kraken.AssetInfoList
 
 import           Control.DeepSeq
 import           Data.Aeson
-import           Data.HashMap.Strict         (elems, keys)
+import           Data.Aeson.Key
+import qualified Data.Aeson.KeyMap           as HM
 import           Data.Serialize
 import           GHC.Generics
 import           Text.PrettyPrint
@@ -24,7 +25,7 @@ data AssetInfoList =
 
 
 instance FromJSON AssetInfoList where
-  parseJSON val = withObject "Data.Kraken.AssetInfoList" (\o -> AssetInfoList . zipWith AssetInfoObject (keys o) <$> mapM parseJSON (elems o)) val
+  parseJSON val = withObject "Data.Kraken.AssetInfoList" (\o -> AssetInfoList . zipWith AssetInfoObject (map toText . HM.keys $ o) <$> mapM parseJSON (HM.elems o)) val
 
 
 prettyAssetInfoList :: AssetInfoList -> Doc

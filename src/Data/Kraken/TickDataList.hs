@@ -10,7 +10,8 @@ module Data.Kraken.TickDataList
 
 import           Control.DeepSeq
 import           Data.Aeson
-import qualified Data.HashMap.Strict                as HM (elems, filterWithKey, keys)
+import           Data.Aeson.Key                     as HM
+import qualified Data.Aeson.KeyMap                  as HM
 import           Data.Serialize
 import qualified Data.Vector                        as V
 import           GHC.Generics
@@ -37,7 +38,7 @@ instance FromJSON TickDataList where
       datas <- mapM (withArray "Data.Kraken.TickDataList parsing TickData" (fmap V.toList . mapM parseJSON)) (mkElems o)
       return $ TickDataList Nothing last' $ zipWith TickDataObject (mkKeys o) datas
     where
-      mkKeys o = filter (/= "last") (HM.keys o)
+      mkKeys o = filter (/= "last") (map HM.toText . HM.keys $ o)
       mkElems o = HM.elems $ HM.filterWithKey (\k _ -> k /= "last") o
 
 setTickDataListGranularity :: CandlestickGranularity -> TickDataList -> TickDataList

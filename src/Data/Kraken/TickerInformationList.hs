@@ -7,7 +7,8 @@ module Data.Kraken.TickerInformationList
 
 import           Control.DeepSeq
 import           Data.Aeson
-import           Data.HashMap.Strict                 (elems, keys)
+import           Data.Aeson.Key
+import qualified Data.Aeson.KeyMap                   as HM
 import           Data.List                           (intersperse)
 import           Data.Serialize
 import           GHC.Generics
@@ -24,7 +25,7 @@ data TickerInformationList =
 
 
 instance FromJSON TickerInformationList where
-  parseJSON = withObject "Data.Kraken.TickerInformationList" $ \o -> TickerInformationList . zipWith TickerInformationObject (keys o) <$> mapM parseJSON (elems o)
+  parseJSON = withObject "Data.Kraken.TickerInformationList" $ \o -> TickerInformationList . zipWith TickerInformationObject (map toText . HM.keys $ o) <$> mapM parseJSON (HM.elems o)
 
 
 prettyTickerInformationList :: TickerInformationList -> Doc
