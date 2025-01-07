@@ -78,7 +78,7 @@ checkInstrData xs@(first:_) = checkDataPoint startStats startXs restXs
       where
         newPriceValue = priceValueToDouble $ price x
         newDiffTime = fromIntegral $ max minDiffTime $ abs $ dateTimeToNanoSeconds (time x) - dateTimeToNanoSeconds (time $ last acc)
-        timePositive = dateTimeToNanoSeconds (time x) > dateTimeToNanoSeconds (time $ last acc) && dateTimeToNanoSeconds (time x) > dateTimeToNanoSeconds (time first)
+        timePositive = dateTimeToNanoSeconds (time x) > dateTimeToNanoSeconds (time $ last acc) && dateTimeToNanoSeconds (time x) >= dateTimeToNanoSeconds (time first)
         newExpPrice = (1 - alpha) * expPrice + alpha * priceValueToDouble (price x)
         newExpDiffTime = (1 - alpha) * expDiffTime + alpha * newDiffTime
     minDiffTime = 10*10^9
