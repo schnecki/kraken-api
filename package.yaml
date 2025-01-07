@@ -1,5 +1,5 @@
 name:                kraken-api
-version:             0.1.0.0
+version:             0.1.0.2
 github:              "schnecki/kraken-api"
 license:             BSD3
 author:              "Manuel Schneckenreither"
@@ -20,7 +20,7 @@ extra-source-files:
 description:         Please see the README on GitHub at <https://github.com/schnecki/kraken-api#readme>
 
 dependencies:
-- base >= 4.7 && < 5
+- base >= 4.9 && < 5
 - aeson
 - aeson-casing
 - bytestring

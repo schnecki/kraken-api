@@ -28,18 +28,12 @@ module Request.Kraken.Class
   , SafeReqM (..)
   ) where
 
-import           Control.Monad.Base
-import           Control.Monad.Except
-import           Control.Monad.IO.Class
-import           Control.Monad.Trans.Control
-import           Control.Monad.Trans.Reader
-import           Control.Monad.Trans.State
+import           Control.Monad                              ((>=>))
 import qualified Crypto.Hash.SHA256                         as SHA256
 import qualified Crypto.Hash.SHA512                         as SHA512
 import           Data.Aeson
 import           Data.Aeson.Key
 import qualified Data.Aeson.KeyMap                          as HM
-import           Data.Bifunctor                             (bimap)
 import qualified Data.ByteString                            as B
 import qualified Data.ByteString                            as BS
 import           Data.ByteString.Builder
