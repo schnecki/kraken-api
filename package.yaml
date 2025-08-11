@@ -58,6 +58,7 @@ dependencies:
 - base64-bytestring
 - base16-bytestring
 - binary
+- network-uri
 
 library:
   source-dirs: src

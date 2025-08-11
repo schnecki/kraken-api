@@ -122,12 +122,14 @@ mkSignAndHeaders cfg r nonce = return (requestHeaders, requestBodyBs)
   where
     otpHeader = maybe [] (\otp -> [(CI.mk $ toBS "otp", otp)]) (mOtp cfg)
     requestHeaders = (CI.mk $ toBS "API-Key", apiKey cfg) : otpHeader ++ [(CI.mk $ toBS "API-Sign", hash)]
-                     -- ++ C.requestHeaders r -- Kraken does not accept the Nonce if there are more HEADERs!
+      -- ++ C.requestHeaders r -- Kraken does not accept the Nonce if there are more HEADERs!
     hash = B64.encode $ SHA512.hmac (privateKeyDecoded cfg) message
     message = C.path r <> sha256Data
     sha256Data = SHA256.hash (nonce <> requestBodyBs)
     bodyData = ("nonce", Just nonce) : bodyToBS (C.requestBody r)
-    requestBodyBs = B.intercalate "&" $ map (\(k, v) -> k <> "=" <> fromMaybe "" v) bodyData
+    -- legacy version: requestBodyBs = B.intercalate "&" $ map (\(k, v) -> k <> "=" <> fromMaybe "" v) bodyData
+    -- Use urlEncodeVars to build the URL-encoded POST data string
+    requestBodyBs = E.encodeUtf8 . T.pack $ urlEncodeVars $ map (\(k, v) -> (T.unpack (E.decodeUtf8 k), T.unpack (maybe "" E.decodeUtf8 v))) bodyData
     toBS = E.encodeUtf8 . T.pack
 
 
